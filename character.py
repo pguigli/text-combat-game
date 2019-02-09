@@ -2,8 +2,45 @@ import random
 from combat import Combat
 
 
-class Character(Combat):
+def show_jobs():
+    '''Show information about available jobs'''
+    print('-'*90)
+    print('Jobs:')
+    print('-'*90)
+    print(" ◊  [W]arrior: \t Lv. 1: +4 base HP (Passive).")
+    print("               \t Lv. 2: Counter-attack (Passive: 60% chance to counter-attack for free).")
+    print("               \t Lv. 3: Zerker (Deals 2x dmg at the cost of life.).\n")
+    print(" ◊  [S]orcerer:  Lv. 1: Drain Life (Inflicts attack damage, and converts them to HP).")
+    print("                 Lv. 2: Greenify (Resets monster color to Green).")
+    print("                 Lv. 3: Blast (Nukes target for +3/+4 dmg).\n")
+    print(" ◊  [P]riest: \t Lv. 1: Cure (Removes 'burning', 'frozen', 'silenced' and 'confused').")
+    print("              \t Lv. 2: Pray (Heals yourself for an amount equal to your attack damage.)")
+    print("              \t Lv. 3: Final wish (Revives you on death, and heals 2-5 health).\n")
+    print(" ◊  [H]unter: \t Lv. 1: Hide (Dodge chance +1, next Attack or Snipe will crit for 2x damage).")
+    print("              \t Lv. 2: Trap (Lays a trap that can stun the enemy when he attacks).")
+    print("              \t Lv. 3: Snipe (Attack that can't be missed or dodged, and inflicts +2 dmg).\n")
+    print('-'*90)
 
+
+def get_job():
+    '''Create player with chosen job'''
+    choices = {
+        'w': Warrior,
+        's': Sorcerer,
+        'p': Priest,
+        'h': Hunter,
+        'c': show_jobs
+    }
+    print('Choose your job:')
+    job_choice = input("[W]arrior, [S]orcerer, [P]riest, [H]unter, "
+                       "or [C] to show job characteristics\n> ").lower()
+    if job_choice in 'wsphc' and job_choice != '':
+        return choices[job_choice]()
+    else:
+        return get_job()
+
+
+class Character(Combat):
     def __init__(self):
         Combat.__init__(self)
         self.name = input("Character's name:\n> ").strip().title()
@@ -120,9 +157,9 @@ class Warrior(Character):
     def spell_3(self, target):
         dmg = self.get_dmg(self.weapon, self)*2
         hurt = int(dmg/2)
-        print(f"You enter a frenzy, \
-                dealing {dmg} damage to the {target.__class__.__name__},\
-                and {hurt} to yourself.")
+        print("You enter a frenzy, "
+              f"dealing {dmg} damage to the {target.__class__.__name__}, "
+              f"and {hurt} to yourself.")
 
 
 class Sorcerer(Character):
@@ -139,8 +176,8 @@ class Sorcerer(Character):
 
     def spell_1(self, target):
         dmg = self.get_dmg(self.weapon, self)
-        print(f"You leech {target.color} {target.__class__.__name__}'s life\
-                for {dmg} damage.")
+        print(f"You leech {target.color} {target.__class__.__name__}'s life "
+              f"for {dmg} damage.")
         target.hp -= dmg
         if self.hp < self.base_hp:
             print(f"You regen {dmg} hp.") 
@@ -151,14 +188,14 @@ class Sorcerer(Character):
 
     def spell_2(self, target):
         if target.color != 'green':
-            print(f"You cast Greenify! The {target.color} {target.__class__.__name__}\
-                    becomes green and loses all his powers.")
+            print(f"You cast Greenify! The {target.color} {target.__class__.__name__} "
+                  "becomes green and loses all his powers.")
             setattr(target, "color", "green")
 
     def spell_3(self, target):
         dmg = self.get_dmg(self.weapon, self) + random.randint(3,4)
-        print(f"You blast {target.color} {target.__class__.__name__}\
-                and inflict a whopping {dmg} damage.")
+        print(f"You blast {target.color} {target.__class__.__name__} "
+              f"and inflict a whopping {dmg} damage.")
         target.hp -= dmg
 
 
@@ -219,6 +256,6 @@ class Hunter(Character):
 
     def spell_3(self, target):
         dmg = self.get_dmg(self.weapon, self) + 2
-        print(f"You fire a deadly shot at the {target.__class__.__name__}!\
-                You hit it for {dmg} damage.")
+        print(f"You fire a deadly shot at the {target.__class__.__name__}! "
+              f"You hit it for {dmg} damage.")
         target.hp -= dmg
