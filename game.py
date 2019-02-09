@@ -4,7 +4,8 @@ import sys
 import time
 
 from character import get_job
-from monster import Goblin, Troll, Dragon
+from monster import (Goblin, Troll, Dragon,
+                     show_color_help)
 
 
 class Game:
@@ -58,6 +59,7 @@ class Game:
     def setup(self):
         self.endgame = False
         self.player = get_job()
+        show_color_help()
         self.monster_pool = [Goblin(), Troll(), Goblin(), Troll(), Goblin()]
         self.boss = [Dragon()]
         self.monster = self.get_next_monster()
@@ -496,6 +498,5 @@ class Game:
                 else:
                     input("You've cleared the dungeon.")
 
-    
 
 Game()

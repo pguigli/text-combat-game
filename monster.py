@@ -9,6 +9,27 @@ COLORS = [('green', ),
 
 WEAPONS = ['claws', 'bow', 'dagger', 'axe', 'lightsaber', 'railgun']
 
+def show_color_help():
+    display_help = input("Do you want to learn about monster colors? [y/n]\n> ").lower()
+    if display_help == 'y':
+        print('-'*90)
+        print('Monster colors:')
+        print('-'*90)
+        print(" ◊  Green: \t Default color. No special attribute.\n")
+        print(" ◊  Red:   \t Monster's attacks have a chance to set you on fire;")
+        print("           \t 'burning': Player burns for 1 damage each turn, for 2 turns.\n")
+        print(" ◊  White: \t Monster's attacks have a chance to freeze you;")
+        print("           \t 'frozen': Player can't perform any action next turn.\n")
+        print(" ◊  Black: \t Monster's attacks have a chance to silence you;")
+        print("           \t 'silenced': Player loses all of his job attributes for 1 turn.\n")
+        print(" ◊  Spectral: \t Monster's attacks have a chance to confuse you;")
+        print("              \t 'confused': Player has a 50% to hurt himself next time he attacks.")
+        print('-'*90)
+
+    elif display_help == 'n' or display_help == '':
+        pass
+    else:
+        show_color_help()
 
 class Monster(Combat):
 
