@@ -27,9 +27,9 @@ def show_color_help():
         print('-'*90)
 
     elif display_help == 'n' or display_help == '':
-        pass
+        return
     else:
-        show_color_help()
+        return show_color_help()
 
 class Monster(Combat):
 

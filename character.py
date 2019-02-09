@@ -20,6 +20,7 @@ def show_jobs():
     print("              \t Lv. 2: Trap (Lays a trap that can stun the enemy when he attacks).")
     print("              \t Lv. 3: Snipe (Attack that can't be missed or dodged, and inflicts +2 dmg).\n")
     print('-'*90)
+    return get_job()
 
 
 def get_job():
@@ -124,7 +125,7 @@ class Character(Combat):
 class Warrior(Character):
     
     def __init__(self):
-        Character.__init__(self)
+        super().__init__()
         self.get_player_stats(14, 14)
         self.job = self.__class__.__name__
         self.spell_2_name = "Counter-Attack"
@@ -142,7 +143,7 @@ class Warrior(Character):
 class Sorcerer(Character):
 
     def __init__(self):
-        Character.__init__(self)
+        super().__init__()
         self.job = self.__class__.__name__
         self.spell_1_name = "[D]rain Life"
         self.spell_1_casts = 2
@@ -179,7 +180,7 @@ class Sorcerer(Character):
 class Priest(Character):
 
     def __init__(self):
-        Character.__init__(self)
+        super().__init__()
         self.job = self.__class__.__name__
         self.spell_1_name = "[C]ure"
         self.spell_1_casts = 2
@@ -210,7 +211,7 @@ class Priest(Character):
 class Hunter(Character):
 
     def __init__(self):
-        Character.__init__(self)
+        super().__init__()
         self.job = self.__class__.__name__
         self.spell_1_name = "[H]ide"
         self.spell_1_casts = 2
