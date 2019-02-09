@@ -69,7 +69,7 @@ class Game:
 
         self.monster_deaths = ["dies!",
                                "screams in agony, and collapses!",
-                               "takes a fatal blow from your {}!".format(self.player.weapon),
+                               f"takes a fatal blow from your {self.player.weapon}!",
                                "succumbs to his wounds!",
                                "runs away in despair, and bleeds to death.",
                                "breathes his last breath... RIP!"]
@@ -98,10 +98,8 @@ class Game:
         if self.monster.hp <= 0:
             time.sleep(1.5)
             d = self.monster_deaths.pop(self.monster_deaths.index(random.choice(self.monster_deaths)))
-            print("{}! The {} {} {}".format(self.monster.battlecry(),
-                                            self.monster.color,
-                                            self.monster.__class__.__name__,
-                                            d))
+            print(f"{self.monster.battlecry()}! The {self.monster.color} \
+                    {self.monster.__class__.__name__} {d}")
 
         # MONSTER ATTACK PHASE
         else:
@@ -109,20 +107,19 @@ class Game:
             # IF MONSTER DOES ATTACK
             if self.monster.attack_hits(self.monster.weapon):
                 time.sleep(1.5)
-                print("The {} {} attacks you with his {}!".format(self.monster.color,
-                                                                  self.monster.__class__.__name__,
-                                                                  self.monster.weapon))
+                print(f"The {self.monster.color} {self.monster.__class__.__name__} \
+                        attacks you with his {self.monster.weapon}!")
 
                 # HE MAY OR MAY NOT FALL IN THE TRAP
                 if self.player.laid_trap:
                     if random.randint(0, 100) > 30:
                         time.sleep(1)
-                        print("CLING! The {} steps on the trap, gets stunned and takes 1 damage!"
-                              .format(self.monster.__class__.__name__))
+                        print(f"CLING! The {self.monster.__class__.__name__} \
+                                steps on the trap, gets stunned and takes 1 damage!")
                         self.monster.hp -= 1
                         self.player.laid_trap = False
                         return
-                          
+
                 # IF ATTACK GOES THROUGH, PLAYER TRIES TO DODGE
                 time.sleep(1.5)
                 print("\nYou try to dodge the attack...", end='')
@@ -141,9 +138,8 @@ class Game:
                     dmg = self.monster.get_dmg(self.monster.weapon, self.player)
                     self.player.hp -= dmg
                     time.sleep(1)
-                    print("The {} {} hits you for {} HP.".format(self.monster.color,
-                                                                 self.monster.__class__.__name__,
-                                                                 dmg))
+                    print(f"The {self.monster.color} {self.monster.__class__.__name__} \
+                            hits you for {dmg} HP.")
 
                     # MONSTER CAN APPLY ON-HIT EFFECT
                     time.sleep(0.5)
@@ -164,7 +160,7 @@ class Game:
             # IF MONSTER DOESN'T ATTACK  
             else:
                 time.sleep(1.5)
-                print("The {} {} ".format(self.monster.color, self.monster.__class__.__name__)
+                print(f"The {self.monster.color} {self.monster.__class__.__name__} "
                       + random.choice(self.monster_actions) + '...')
                 time.sleep(1.5)
 
@@ -243,9 +239,8 @@ class Game:
                     print("\nYou're so confused!")
                     time.sleep(0.5)
                     dmg = self.player.get_dmg(self.player.weapon, self.player)
-                    print("You trip and fall down head first on your {}, "
-                          "hurting yourself for {} damage!"
-                          .format(self.player.weapon, dmg))
+                    print(f"You trip and fall down head first on your {self.player.weapon}, \
+                            hurting yourself for {dmg} damage!")
                     self.player.hp -= dmg
                     time.sleep(1)
 
@@ -319,23 +314,35 @@ class Game:
 
             # DISPLAY RELEVANT SPELLS (IF LVL 1, LVL 2, OR LVL 3)
             if self.player.xpn == 5:
-                action = input('\n[A]ttack \n{} ({}) \n[R]est \n[Q]uit\n\n> '
-                               .format(self.player.spell_1_name, self.player.spell_1_casts)).lower()
+                action = input(f"\n[A]ttack \
+                                 \n{self.player.spell_1_name} ({self.player.spell_1_casts}) \
+                                 \n[R]est \
+                                 \n[Q]uit\n\
+                                 \n> ")
             elif self.player.xpn == 6:
-                action = input('\n[A]ttack \n{} ({}) \n{} ({}) \n[R]est \n[Q]uit\n\n> '
-                               .format(self.player.spell_1_name, self.player.spell_1_casts,
-                                       self.player.spell_2_name, self.player.spell_2_casts)).lower()
+                action = input(f"\n[A]ttack \
+                                 \n{self.player.spell_1_name} ({self.player.spell_1_casts}) \
+                                 \n{self.player.spell_2_name} ({self.player.spell_2_casts}) \
+                                 \n[R]est \
+                                 \n[Q]uit\n\
+                                 \n> ")
             else:
-                action = input('\n[A]ttack \n{} ({}) \n{} ({}) \n{} ({}) \n[R]est \n[Q]uit\n\n> '
-                               .format(self.player.spell_1_name, self.player.spell_1_casts,
-                                       self.player.spell_2_name, self.player.spell_2_casts,
-                                       self.player.spell_3_name, self.player.spell_3_casts)).lower()
+                action = input(f"\n[A]ttack \
+                                 \n{self.player.spell_1_name} ({self.player.spell_1_casts}) \
+                                 \n{self.player.spell_2_name} ({self.player.spell_2_casts}) \
+                                 \n{self.player.spell_3_name} ({self.player.spell_3_casts}) \
+                                 \n[R]est \
+                                 \n[Q]uit\n\
+                                 \n> ")
 
         # CASE OF WARRIOR OR 'JOBLESS' (NO ACTIVE SPELL UNTIL LVL 3)
         elif self.player.job == "Warrior":
             if self.player.xpn > 6:
-                action = input('\n[A]ttack \n{} ({}) \n[R]est \n[Q]uit\n\n> '
-                               .format(self.player.spell_3_name, self.player.spell_3_casts)).lower()
+                action = input(f"\n[A]ttack \
+                                 \n{self.player.spell_3_name} ({self.player.spell_3_casts}) \
+                                 \n[R]est \
+                                 \n[Q]uit\n\
+                                 \n> ")
             else:
                 action = input('\n[A]ttack \n[R]est \n[Q]uit\n\n> ')
         else:
@@ -370,7 +377,7 @@ class Game:
                 if self.player.hp <= 0:
                     time.sleep(1)
                     print("The fire damage was fatal... You die!")
-                    
+
                     # IF PRIEST USED REVIVE
                     if self.player.revive:
                         print("RESURRECTION!")
@@ -378,9 +385,9 @@ class Game:
                         self.player.hp += 1
                         self.player.revive = False
                         time.sleep(1)
-                    
+
                     # OTHERWISE
-                    else:    
+                    else:
                         time.sleep(1)
                         sys.exit()
 
@@ -401,15 +408,15 @@ class Game:
     # PLAYER PHYSICAL ATTACK PHASE
     def player_attack_phase(self):
         time.sleep(0.5)
-        print("\nYou draw your {} to attack the {}...".format(self.player.weapon,
-                                                              self.monster.__class__.__name__), end='')
+        print(f"\nYou draw your {self.player.weapon} \
+                to attack the {self.monster.__class__.__name__}...", end='')
 
         # PLAYER HITS
         if self.player.attack_hits(self.player.weapon):
             time.sleep(0.5)
             print(" and hit!")
             time.sleep(1)
-            print("The {} tries to dodge...".format(self.monster.__class__.__name__), end='')
+            print(f"The {self.monster.__class__.__name__} tries to dodge...", end='')
             sys.stdout.flush()
 
             # MONSTER DODGES
@@ -424,7 +431,7 @@ class Game:
                 dmg = self.player.get_dmg(self.player.weapon, self.player)
                 self.monster.hp -= dmg
                 time.sleep(1)
-                print("You hit it for {} HP.".format(dmg))
+                print(f"You hit it for {dmg} HP.")
 
         # PLAYER MISSES
         else:
@@ -434,7 +441,7 @@ class Game:
 
     # DEAD MONSTER CLEANUP
     def cleanup(self):
-        
+
         # IF PRIEST DIES AFTER USING REVIVE
         if self.player.hp <= 0 and self.player.revive:
             print("You die.")
@@ -444,14 +451,14 @@ class Game:
             self.player.hp += random.randint(2,5)
             self.player.revive = False
             time.sleep(1)
-            
-            
+
+
         if self.monster.hp <= 0:
             time.sleep(1.5)
-            print("You have defeated the {} {} !".format(self.monster.color, self.monster.__class__.__name__))
+            print(f"You have defeated the {self.monster.color} {self.monster.__class__.__name__}!")
             self.player.killed_a_monster = True
             time.sleep(0.5)
-            print("You gain {} XP!".format(self.monster.xp))
+            print(f"You gain {self.monster.xp} XP!")
             self.player.xp += self.monster.xp
 
             # PLAYER LEVELS UP
@@ -462,24 +469,24 @@ class Game:
                     self.player.max_dmg += 1
                     self.player.attack_dice += 2
                     time.sleep(1)
-                    print("You learn {}!".format(self.player.spell_2_name))
+                    print(f"You learn {self.player.spell_2_name}!")
                 time.sleep(1)
                 if self.player.level == 3:
                     print("\nLEVEL UP! You gain +1 max. damage, and +2 evasion!")
                     self.player.max_dmg += 1
                     self.player.dodge_dice += 2
                     time.sleep(1)
-                    print("You learn {}!".format(self.player.spell_3_name))
+                    print(f"You learn {self.player.spell_3_name}!")
                 time.sleep(1)
-                
+
 
             self.monster = self.get_next_monster()
             print('\n'+'='*90)
 
             # PRINTS RELEVANT FOOTER
             if len(self.boss) != 0:
-                input("{} enemies remaining. Press [Enter] to go ahead. "
-                      .format(len(self.monster_pool)+len(self.boss)))
+                remaining = len(self.monster_pool) + len(self.boss)
+                input(f"{remaining} enemies remaining. Press [Enter] to go ahead. ")
             else:
                 if self.endgame == False:
                     input("You've woken up the ancient Dragon! Press [Enter] to go ahead. ")
@@ -494,13 +501,13 @@ class Game:
         print('Jobs:')
         print('-'*90)
         print(" ◊  [W]arrior: \t Lv. 1: +4 base HP (Passive).")
-        print("               \t Lv. 2: Counter-attack (Passive: 60% chance to counter-attack for free).\n")
+        print("               \t Lv. 2: Counter-attack (Passive: 60% chance to counter-attack for free).")
         print("               \t Lv. 3: Zerker (Deals 2x dmg at the cost of life.).\n")
         print(" ◊  [S]orcerer:  Lv. 1: Drain Life (Inflicts attack damage, and converts them to HP).")
-        print("                 Lv. 2: Greenify (Resets monster color to Green).\n")
+        print("                 Lv. 2: Greenify (Resets monster color to Green).")
         print("                 Lv. 3: Blast (Nukes target for +3/+4 dmg).\n")
         print(" ◊  [P]riest: \t Lv. 1: Cure (Removes 'burning', 'frozen', 'silenced' and 'confused').")
-        print("              \t Lv. 2: Pray (Heals yourself for an amount equal to your attack damage.)\n")
+        print("              \t Lv. 2: Pray (Heals yourself for an amount equal to your attack damage.)")
         print("              \t Lv. 3: Final wish (Revives you on death, and heals 2-5 health).\n")
         print(" ◊  [H]unter: \t Lv. 1: Hide (Dodge chance +1, next Attack or Snipe will crit for 2x damage).")
         print("              \t Lv. 2: Trap (Lays a trap that can stun the enemy when he attacks).")
@@ -527,5 +534,4 @@ class Game:
             return self.get_job()
 
 
-
-Game()      
+Game()

@@ -11,7 +11,7 @@ WEAPONS = ['claws', 'bow', 'dagger', 'axe', 'lightsaber', 'railgun']
 
 
 class Monster(Combat):
-    
+
     def __init__(self):
         Combat.__init__(self)
         self.get_monster_stats()
@@ -67,7 +67,7 @@ class Monster(Combat):
 
     def on_hit_effect(self, target):
         if self.color != 'green':
-            print("\nThe {} {}'s attack ".format(self.color, self.__class__.__name__)
+            print(f"\nThe {self.color} {self.__class__.__name__}'s attack "
                   + self.attack_effect + "!")
             if not self.debuff in target.status:
                 target.status.append(self.debuff)
@@ -75,7 +75,7 @@ class Monster(Combat):
                 target.burn_duration = 2
             elif self.debuff == 'silenced':
                 target.silence_duration = 2
-            
+
 
 class Goblin(Monster):
     pass

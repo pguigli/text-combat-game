@@ -3,13 +3,13 @@ import character
 
 
 class Combat:
-    
+
     def __init__(self):
         self.attack_dice = 6
         self.dodge_dice = 6
         self.min_dmg = 1
         self.max_dmg = 1
-    
+
     def attack_hits(self, weapon):
         roll = random.randint(1, self.attack_dice)
         if weapon == 'railgun':
@@ -25,7 +25,7 @@ class Combat:
         else:
             pass
         return roll > 2
-        
+
     def dodge(self, weapon, player): 
         roll = random.randint(1, self.dodge_dice)
         if player.hidden:
@@ -43,7 +43,7 @@ class Combat:
         else:
             pass
         return roll > 4
-        
+
     def get_dmg(self, weapon, player):
         if weapon == 'railgun':
             dmg = random.randint(self.min_dmg+1, self.max_dmg+3)
@@ -63,6 +63,3 @@ class Combat:
             return 2*dmg
         else:
             return dmg
-            
-            
-            
