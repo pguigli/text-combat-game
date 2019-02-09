@@ -1,3 +1,4 @@
+import random
 from combat import Combat
 
 
@@ -132,6 +133,8 @@ class Sorcerer(Character):
         self.spell_1_casts = 2
         self.spell_2_name = "[G]reenify"
         self.spell_2_casts = 1
+        self.spell_3_name = "[B]last"
+        self.spell_3_casts = 1
         
     def spell_1(self, target):
         dmg = self.get_dmg(self.weapon, self)
@@ -149,8 +152,13 @@ class Sorcerer(Character):
             print("You cast Greenify! The {} {} becomes green and loses his powers.".format(target.color,
                                                                                             target.__class__.__name__))
             setattr(target, "color", "green")
-        
-        
+
+    def spell_3(self, target):
+        dmg = self.get_dmg(self.weapon, self) + random.randint(3,4)
+        print("You blast {} {} and inflict a whopping {} damage.".format(target.color, target.__class__.__name__, dmg))
+        target.hp -= dmg
+
+
 class Priest(Character):
     
     def __init__(self):
@@ -209,9 +217,3 @@ class Hunter(Character):
         dmg = self.get_dmg(self.weapon, self) + 2                            
         print("You fire a deadly shot at the {}! You hit it for {} damage.".format(target.__class__.__name__, dmg))
         target.hp -= dmg
-        
-    
-            
-        
-        
-

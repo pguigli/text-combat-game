@@ -333,7 +333,7 @@ class Game:
 
         # CASE OF WARRIOR OR 'JOBLESS' (NO ACTIVE SPELL UNTIL LVL 3)
         elif self.player.job == "Warrior":
-            if self.player.xpn >= 6:
+            if self.player.xpn > 6:
                 action = input('\n[A]ttack \n{} ({}) \n[R]est \n[Q]uit\n\n> '
                                .format(self.player.spell_3_name, self.player.spell_3_casts)).lower()
             else:
@@ -344,7 +344,7 @@ class Game:
         # MAKE SURE THAT ONLY JOB ALLOWED ACTIONS ARE SELECTED
         for job, allowed_actions in {'Jobless': 'arq',
                                      'Warrior': 'arq',
-                                     'Sorcerer': 'arqdg',
+                                     'Sorcerer': 'arqdgb',
                                      'Priest': 'arqcpf',
                                      'Hunter': 'arqhts'}.items():
             if self.player.job == job:
@@ -495,10 +495,10 @@ class Game:
         print('-'*90)
         print(" ◊  [W]arrior: \t Lv. 1: +4 base HP (Passive).")
         print("               \t Lv. 2: Counter-attack (Passive: 60% chance to counter-attack for free).\n")
-        print("               \t Lv. 3: Zerker (Deals massive damage at the cost of life.).\n")
+        print("               \t Lv. 3: Zerker (Deals 2x dmg at the cost of life.).\n")
         print(" ◊  [S]orcerer:  Lv. 1: Drain Life (Inflicts attack damage, and converts them to HP).")
         print("                 Lv. 2: Greenify (Resets monster color to Green).\n")
-        print("                 Lv. 3: Blast (Nukes target for ).\n")
+        print("                 Lv. 3: Blast (Nukes target for +3/+4 dmg).\n")
         print(" ◊  [P]riest: \t Lv. 1: Cure (Removes 'burning', 'frozen', 'silenced' and 'confused').")
         print("              \t Lv. 2: Pray (Heals yourself for an amount equal to your attack damage.)\n")
         print("              \t Lv. 3: Final wish (Revives you on death, and heals 2-5 health).\n")

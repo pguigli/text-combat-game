@@ -57,7 +57,7 @@ class Combat:
             dmg = random.randint(self.min_dmg, self.max_dmg+1)
         else:
             dmg = random.randint(self.min_dmg, self.max_dmg)
-        if self.job == "Hunter" and ( random.randint(1,10) > 7 or player.hidden ):
+        if player.job == "Hunter" and ( random.randint(1,10) > 7 or player.hidden ):
             print("*Critical strike!*")
             player.hidden = False
             return 2*dmg
