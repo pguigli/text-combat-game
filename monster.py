@@ -1,3 +1,4 @@
+import os
 import random
 from combat import Combat
 
@@ -12,24 +13,31 @@ WEAPONS = ['claws', 'bow', 'dagger', 'axe', 'lightsaber', 'railgun']
 def show_color_help():
     display_help = input("Do you want to learn about monster colors? [y/n]\n> ").lower()
     if display_help == 'y':
-        print('-'*90)
-        print('Monster colors:')
-        print('-'*90)
-        print(" ◊  Green: \t Default color. No special attribute.\n")
-        print(" ◊  Red:   \t Monster's attacks have a chance to set you on fire;")
-        print("           \t 'burning': Player burns for 1 damage each turn, for 2 turns.\n")
-        print(" ◊  White: \t Monster's attacks have a chance to freeze you;")
-        print("           \t 'frozen': Player can't perform any action next turn.\n")
-        print(" ◊  Black: \t Monster's attacks have a chance to silence you;")
-        print("           \t 'silenced': Player loses all of his job attributes for 1 turn.\n")
-        print(" ◊  Spectral: \t Monster's attacks have a chance to confuse you;")
-        print("              \t 'confused': Player has a 50% to hurt himself next time he attacks.")
-        print('-'*90)
+        os.system('clear')
+        print("""\
+--------------------------------------------------------------------------------
+Monster colors:
+--------------------------------------------------------------------------------
+◊ Green:    Default color. No special attribute.
+
+◊ Red:      Monster's attacks have a chance to set you on fire;
+            'burning': Player burns for 1 damage each turn, for 2 turns.
+
+◊ White:    Monster's attacks have a chance to freeze you;
+            'frozen': Player can't perform any action next turn.
+
+◊ Black:    Monster's attacks have a chance to silence you;
+            'silenced': Player loses all of his job attributes for 1 turn.
+
+◊ Spectral: Monster's attacks have a chance to confuse you;
+            'confused': Player has a 50% to hurt himself next time he attacks.
+--------------------------------------------------------------------------------""")
 
     elif display_help == 'n' or display_help == '':
         return
     else:
         return show_color_help()
+
 
 class Monster(Combat):
 
@@ -103,7 +111,6 @@ class Goblin(Monster):
 
 
 class Troll(Monster):
-   
     def __init__(self):
         Monster.__init__(self)
         self.get_monster_stats(0, 'bwah', 3, 5, 3, 5, 2, 3, w_end=5)
@@ -112,7 +119,6 @@ class Troll(Monster):
 
 
 class Dragon(Monster):
-
     def __init__(self):
         Monster.__init__(self)
         self.get_monster_stats(1, 'grrrrr', 6, 10, 5, 10, 3, 5, w_start=3, w_end=6)

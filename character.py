@@ -1,27 +1,32 @@
+import os
 import random
 from combat import Combat
 
 
 def show_jobs():
     '''Show information about available jobs'''
-    print('-'*90)
-    print('Jobs:')
-    print('-'*90)
-    print(" ◊  [W]arrior: \t Lv. 1: +4 base HP (Passive).")
-    print("               \t Lv. 2: Counter-attack (Passive: 60% chance to counter-attack for free).")
-    print("               \t Lv. 3: Zerker (Deals 2x dmg at the cost of life.).\n")
-    print(" ◊  [S]orcerer:  Lv. 1: Drain Life (Inflicts attack damage, and converts them to HP).")
-    print("                 Lv. 2: Greenify (Resets monster color to Green).")
-    print("                 Lv. 3: Blast (Nukes target for +3/+4 dmg).\n")
-    print(" ◊  [P]riest: \t Lv. 1: Cure (Removes 'burning', 'frozen', 'silenced' and 'confused').")
-    print("              \t Lv. 2: Pray (Heals yourself for an amount equal to your attack damage.)")
-    print("              \t Lv. 3: Final wish (Revives you on death, and heals 2-5 health).\n")
-    print(" ◊  [H]unter: \t Lv. 1: Hide (Dodge chance +1, next Attack or Snipe will crit for 2x damage).")
-    print("              \t Lv. 2: Trap (Lays a trap that can stun the enemy when he attacks).")
-    print("              \t Lv. 3: Snipe (Attack that can't be missed or dodged, and inflicts +2 dmg).\n")
-    print('-'*90)
-    return get_job()
+    os.system('clear')
+    print("""\
+---------------------------------------------------------------------------------------------
+Jobs:
+---------------------------------------------------------------------------------------------
+◊ [W]arrior:    Lv. 1: +4 base HP (Passive).
+                Lv. 2: Counter-attack (Passive: 60% chance to counter-attack for free).
+                Lv. 3: Zerker (Deals 2x dmg at the cost of life.).
 
+◊ [S]orcerer:   Lv. 1: Drain Life (Inflicts attack damage, and converts them to HP).
+                Lv. 2: Greenify (Resets monster color to Green).
+                Lv. 3: Blast (Nukes target for +3/+4 dmg).
+
+◊ [P]riest:     Lv. 1: Cure (Removes 'burning', 'frozen', 'silenced' and 'confused').
+                Lv. 2: Pray (Heals yourself for an amount equal to your attack damage.)
+                Lv. 3: Final wish (Revives you on death, and heals 2-5 health).
+
+◊ [H]unter:     Lv. 1: Hide (Dodge chance +1, next Attack / Snipe will crit for 2x damage).
+                Lv. 2: Trap (Lays a trap that can stun the enemy when he attacks).
+                Lv. 3: Snipe (Attack that can't be missed or dodged, and inflicts +2 dmg).
+---------------------------------------------------------------------------------------------""")
+    return get_job()
 
 def get_job():
     '''Create player with chosen job'''
@@ -66,7 +71,6 @@ class Character(Combat):
                              + header_string)
         return header_string
 
-
     def get_weapon(self):
         print('Choose your weapon:')
         weapon_choice = input('[A]xe, [B]ow, [D]agger, or [W] to show weapon characteristics\n> ').lower()
@@ -85,15 +89,17 @@ class Character(Combat):
 
     @staticmethod
     def show_weapons():
-        print('-'*90)
-        print('Weapons:')
-        print('-'*90)
-        print(' ◊  [A]xe: \t +1 max. damage,   +1 min. damage.')
-        print(' ◊  [B]ow: \t +1 max. damage,   +1 dodge chance.')
-        print(' ◊  [D]agger: \t +1 max. damage,   +1 hit chance.')
-        print(' ◊  Lightsaber:  +2 max. damage,   +1 hit chance.')
-        print(' ◊  Railgun: \t +3 max. damage,   +1 min. damage,   +1 dodge chance.')
-        print('-'*90)
+        os.system('clear')
+        print("""\
+---------------------------------------------------------------------
+Weapons:
+---------------------------------------------------------------------
+◊  [A]xe:       +1 max. damage,   +1 min. damage.
+◊  [B]ow:       +1 max. damage,   +1 dodge chance.
+◊  [D]agger:    +1 max. damage,   +1 hit chance.
+◊  Lightsaber:  +2 max. damage,   +1 hit chance.
+◊  Railgun:     +3 max. damage,   +1 min. damage,   +1 dodge chance.
+---------------------------------------------------------------------""")
 
     def get_player_stats(self, hp=10, base_hp=10, 
                          xp=0, xpn=5,
@@ -123,7 +129,6 @@ class Character(Combat):
 
 
 class Warrior(Character):
-    
     def __init__(self):
         super().__init__()
         self.get_player_stats(14, 14)
@@ -138,10 +143,11 @@ class Warrior(Character):
         print("You enter a frenzy, "
               f"dealing {dmg} damage to the {target.__class__.__name__}, "
               f"and {hurt} to yourself.")
+        target.hp -= dmg
+        self.hp -= hurt
 
 
 class Sorcerer(Character):
-
     def __init__(self):
         super().__init__()
         self.job = self.__class__.__name__
@@ -178,7 +184,6 @@ class Sorcerer(Character):
 
 
 class Priest(Character):
-
     def __init__(self):
         super().__init__()
         self.job = self.__class__.__name__
@@ -209,7 +214,6 @@ class Priest(Character):
 
 
 class Hunter(Character):
-
     def __init__(self):
         super().__init__()
         self.job = self.__class__.__name__

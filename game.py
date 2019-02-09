@@ -20,25 +20,25 @@ class Game:
 
             # PRINT HEADER WITH PLAYER / MONSTER INFO
             os.system('clear')
-            print('='*90)
+            print('='*70)
             print(self.player)
-            print('-'*90)
+            print('-'*70)
             print(self.monster.battlecry(), "\nA wild creature appears:")
             print(self.monster)
-            print('-'*90)
+            print('-'*70)
 
             #PLAYER TURN
             self.player_turn()
-            print(' ')
+            print()
 
             #MONSTER TURN
             self.monster_turn()
-            print(' ')
+            print()
 
             #CLEANUP
             self.cleanup()
             if not self.player.killed_a_monster:
-                print('-'*90)
+                print('-'*70)
                 input('End of turn. Press [Enter] to continue.')
 
         # IF PLAYER REMAINS
@@ -274,6 +274,7 @@ class Game:
             self.player_cast_phase('Sorcerer', 'd', 'g', 'b')
             self.player_cast_phase('Priest', 'c', 'p', 'f')
             self.player_cast_phase('Hunter', 'h', 't', 's')
+            self.player_cast_phase('Warrior', None, None, 'z')
 
     # PLAYER SPELL CAST PHASE
     def player_cast_phase(self, what_job, action1, action2, action3):
@@ -354,7 +355,7 @@ class Game:
 
         # MAKE SURE THAT ONLY JOB ALLOWED ACTIONS ARE SELECTED
         for job, allowed_actions in {'Jobless': 'arq',
-                                     'Warrior': 'arq',
+                                     'Warrior': 'arqz',
                                      'Sorcerer': 'arqdgb',
                                      'Priest': 'arqcpf',
                                      'Hunter': 'arqhts'}.items():
@@ -485,7 +486,7 @@ class Game:
 
 
             self.monster = self.get_next_monster()
-            print('\n'+'='*90)
+            print('\n'+'='*70)
 
             # PRINTS RELEVANT FOOTER
             if len(self.boss) != 0:
@@ -498,5 +499,5 @@ class Game:
                 else:
                     input("You've cleared the dungeon.")
 
-
-Game()
+if __name__ == '__main__':
+    Game()
