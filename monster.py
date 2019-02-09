@@ -28,7 +28,7 @@ class Monster(Combat):
 
     def get_monster_stats(self, c_start=0, sound='roar',
                           min_hp=1, max_hp=1, 
-                          min_xp=5, max_xp=5, 
+                          min_xp=2, max_xp=3, 
                           min_dmg=1, max_dmg=1,
                           attack_dice=6, dodge_dice=6, 
                           w_start=1, w_end=4):
@@ -94,6 +94,6 @@ class Dragon(Monster):
 
     def __init__(self):
         Monster.__init__(self)
-        self.get_monster_stats(1, 'grrrrr', 5, 10, 5, 10, 2, 5, w_start=3, w_end=6)
+        self.get_monster_stats(1, 'grrrrr', 6, 10, 5, 10, 3, 5, w_start=3, w_end=6)
         self.get_monster_hp()
         self.get_monster_xp()
