@@ -458,15 +458,17 @@ class Game:
     def cleanup(self):
 
         # IF PRIEST DIES AFTER USING REVIVE
-        if self.player.hp <= 0 and self.player.revive:
-            print("You die.")
-            time.sleep(1)
-            print("The Mighty Gods heard your prayer. You are given another chance.")
-            print("RESURRECTION!")
-            self.player.hp += random.randint(2,5)
-            self.player.revive = False
-            time.sleep(1)
-
+        try:
+            if self.player.hp <= 0 and self.player.revive:
+                print("You die.")
+                time.sleep(1)
+                print("The Mighty Gods heard your prayer. You are given another chance.")
+                print("RESURRECTION!")
+                self.player.hp += random.randint(2,5)
+                self.player.revive = False
+                time.sleep(1)
+        except AttributeError:
+            pass
 
         if self.monster.hp <= 0:
             time.sleep(1.5)
