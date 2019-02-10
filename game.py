@@ -266,8 +266,6 @@ class Game:
         # REST
         elif self.action == 'r':
             self.player.rest()
-            time.sleep(0.5)
-            print("\nYou rest, and regenerate 1 HP!")
 
         # QUIT
         elif self.action == 'q':
@@ -394,7 +392,7 @@ class Game:
                         if self.player.revive:
                             print("RESURRECTION!")
                             print("The Mighty Gods heard your prayer. You are given another chance.")
-                            self.player.hp += 1
+                            self.player.hp = randon.randint(2,5)
                             self.player.revive = False
                             time.sleep(1)
                     except AttributeError:

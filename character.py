@@ -1,9 +1,16 @@
 import os
 import random
+import time
 
-from combat import Combat
+from fighter import Fighter
 from weapon import (Axe, Dagger, Bow,
                     show_weapons)
+
+
+SHORT = 0.5
+MEDIUM = 1
+LONG = 1.5
+
 
 def show_jobs():
     '''Show information about available jobs'''
@@ -57,7 +64,7 @@ def get_job():
         return get_job()
 
 
-class Character(Combat):
+class Character(Fighter):
     def __init__(self):
         super().__init__()
         self.name = input("Character's name:\n> ").strip().title()
@@ -107,6 +114,10 @@ class Character(Combat):
     def rest(self):
         if self.hp < self.max_hp:
             self.hp += 1
+            print("\nYou rest, and regenerate 1 HP!")
+        else: 
+            print("\nYou rest, because why not.")
+        time.sleep(SHORT)
 
     def leveled_up(self):
         if self.xp >= self.max_xp:

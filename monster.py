@@ -1,7 +1,7 @@
 import os
 import random
 
-from combat import Combat
+from fighter import Fighter
 from weapon import (KungFu, Axe, Dagger, Bow,
                     Lightsaber, Railgun)
 
@@ -50,7 +50,7 @@ Monster colors:
         return show_color_help()
 
 
-class Monster(Combat):
+class Monster(Fighter):
 
     def __init__(self, hp_min=1, hp_max=1,
                        xp_min=1, xp_max=2):

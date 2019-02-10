@@ -1,8 +1,7 @@
 import random
-import character
 
 
-class Combat:
+class Fighter:
     def __init__(self):
         self.hit_chance = 80 
         self.dodge_chance = 20
