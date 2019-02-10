@@ -133,7 +133,7 @@ class Warrior(Character):
         dmg = self.get_atk_dmg(self.weapon, target)*2
         hurt = int(dmg/2)
         print("You enter a frenzy, "
-              f"dealing {dmg} damage to the {target.__class__.__name__}, "
+              f"dealing {dmg} damage to the {target.name}, "
               f"and {hurt} to yourself.")
         target.hp -= dmg
         self.hp -= hurt
@@ -154,7 +154,7 @@ class Sorcerer(Character):
 
     def spell_1(self, target):
         dmg = self.get_atk_dmg(self.weapon, target)
-        print(f"You leech {target.color} {target.__class__.__name__}'s life "
+        print(f"You leech {target.color} {target.name}'s life "
               f"for {dmg} damage.")
         target.hp -= dmg
         if self.hp < self.max_hp:
@@ -166,13 +166,13 @@ class Sorcerer(Character):
 
     def spell_2(self, target):
         if target.color != 'green':
-            print(f"You cast Greenify! The {target.color} {target.__class__.__name__} "
+            print(f"You cast Greenify! The {target.color} {target.name} "
                   "becomes green and loses all his powers.")
             setattr(target, "color", "green")
 
     def spell_3(self, target):
         dmg = self.get_atk_dmg(self.weapon, target) + random.randint(3,4)
-        print(f"You blast {target.color} {target.__class__.__name__} "
+        print(f"You blast {target.color} {target.name} "
               f"and inflict a whopping {dmg} damage.")
         target.hp -= dmg
 
@@ -194,7 +194,7 @@ class Priest(Character):
 
     def spell_1(self, target):
         status = ", ".join(self.status)
-        print(f"You cure yourself of all status ailments! (removed: {status}.)")
+        print(f"You cure yourself of all status ailments! (removed: '{status}')")
         self.status = []
 
     def spell_2(self, target):
@@ -249,6 +249,6 @@ class Hunter(Character):
 
     def spell_3(self, target):
         dmg = self.get_atk_dmg(self.weapon, target) + 2
-        print(f"You fire a deadly shot at the {target.__class__.__name__}! "
+        print(f"You fire a deadly shot at the {target.name}! "
               f"You hit it for {dmg} damage.")
         target.hp -= dmg

@@ -25,5 +25,13 @@ class Combat:
 
     def get_atk_dmg(self, weapon, target):
         '''Return damage value depending on entities stats and weapon'''
+        try:
+            if self.hidden:
+                w_dmg = weapon.get_dmg(will_crit=True)
+                dmg = (w_dmg * self.attack_power) - target.toughness
+                self.hidden = False
+                return dmg
+        except AttributeError:
+            pass
         dmg = (weapon.get_dmg() * self.attack_power) - target.toughness
         return dmg

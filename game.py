@@ -60,7 +60,7 @@ class Game:
         self.endgame = False
         self.player = get_job()
         show_color_help()
-        self.monster_pool = [Goblin(), Troll(), Goblin(), Troll(), Goblin()]
+        self.monster_pool = [Goblin(), Goblin(), Goblin(), Troll(), Troll()]
         self.boss = [Dragon()]
         self.monster = self.get_next_monster()
         self.monster_actions = ["is in no mood to attack",
@@ -80,9 +80,11 @@ class Game:
 
         input("Press [Enter] to start the game.")
 
-    # GETS NEXT MONSTER FROM POOL, AND THEN BOSS
+    # GETS 2 GOBLINS, THEN NEXT RANDOM MONSTER, AND THEN BOSS
     def get_next_monster(self):
-        if len(self.monster_pool) > 0:
+        if len(self.monster_pool) > 3:
+            return self.monster_pool.pop(0)
+        elif len(self.monster_pool) > 0:
             random_monster_id = self.monster_pool.index(random.choice(self.monster_pool))
             return self.monster_pool.pop(random_monster_id)
         else:
@@ -216,6 +218,7 @@ class Game:
             if self.player.old_job == "Priest" and self.player.spell_1_casts > 0:
                 if input("Luckily you're a Priest. Use [C]ure? [y/n]\n> ").lower() in 'cy':
                     self.player.spell_1(self.player)
+                    self.player.spell_1_casts -= 1
                     self.player.job = self.player.old_job
                     if self.player.job == "Warrior":
                         self.player.max_hp = 14

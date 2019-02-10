@@ -96,8 +96,8 @@ class Monster(Combat):
 
 class Goblin(Monster):
     def __init__(self):
-        super().__init__(hp_min=1, hp_max=3,
-                         xp_min=1, xp_max=2)
+        super().__init__(hp_min=1, hp_max=2,
+                         xp_min=2, xp_max=3)
         self.name = 'Goblin'
         self.allowed_weapons = ["level_0", "level_1"]
         self.weapon = self.get_weapon()
