@@ -139,7 +139,6 @@ class Game:
                     time.sleep(0.5)
                     print(" and succeed!")
                     time.sleep(1.5)
-                    return
 
                 # DODGE FAILS = PROCEED
                 else:
