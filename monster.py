@@ -1,14 +1,25 @@
 import os
 import random
+
 from combat import Combat
+from weapon import (KungFu, Axe, Dagger, Bow,
+                    Lightsaber, Railgun)
 
-COLORS = [('green', ),
-          ('white', 'freezes you', 'frozen'),
-          ('red', 'sets you on fire', 'burning'),
-          ('spectral', 'confuses you', 'confused'),
-          ('black', 'silences you', 'silenced')]
 
-WEAPONS = ['claws', 'bow', 'dagger', 'axe', 'lightsaber', 'railgun']
+COLORS = {
+    'green': [None, None],
+    'white': ['freezes you', 'frozen'],
+    'red': ['sets you on fire', 'burning'],
+    'spectral': ['confuses you', 'confused'],
+    'black': ['silences you', 'silenced']
+    }
+
+WEAPONS = {
+    'level_0': [KungFu],
+    'level_1': [Axe, Dagger, Bow],
+    'level_2': [Lightsaber],
+    'level_3': [Railgun]
+    }
 
 def show_color_help():
     display_help = input("Do you want to learn about monster colors? [y/n]\n> ").lower()
@@ -41,62 +52,35 @@ Monster colors:
 
 class Monster(Combat):
 
-    def __init__(self):
-        Combat.__init__(self)
-        self.get_monster_stats()
-        self.get_monster_hp()
-        self.get_monster_xp()
-        self.job = "Jobless"
+    def __init__(self, hp_min=1, hp_max=1,
+                       xp_min=1, xp_max=2):
+        super().__init__()
+        self.name = 'Monster'
+        self.sound = 'roar'
+        self.hp = random.randint(hp_min, hp_max)
+        self.xp = random.randint(xp_min, xp_max)
+        self.color = random.choice(list(COLORS.keys()))
+        self.attack_effect = self.get_attack_effect()
+        self.debuff = self.get_debuff()
+        self.allowed_weapons = ["level_0"]
+        self.weapon = self.get_weapon()
 
     def __str__(self):
-        return (f"{self.color.title()} {self.__class__.__name__}, "
-                f"HP: {self.hp}, XP: {self.xp}, Weapon: {self.weapon.title()}")
+        return (f"{self.color.title()} {self.name}, "
+                f"HP: {self.hp}, XP: {self.xp}, Weapon: {self.weapon.name}")
 
     def battlecry(self):
         return self.sound.upper() + "!"
 
-    def get_monster_stats(self, c_start=0, sound='roar',
-                          min_hp=1, max_hp=1, 
-                          min_xp=2, max_xp=3, 
-                          min_dmg=1, max_dmg=1,
-                          attack_dice=6, dodge_dice=6, 
-                          w_start=1, w_end=4):
-        self.category = random.choice(COLORS[c_start:])
-        self.color = self.category[0]
-        self.debuff = self.get_debuff()
-        self.attack_effect = self.get_attack_effect()
-        self.min_hp = min_hp
-        self.max_hp = max_hp
-        self.min_xp = min_xp
-        self.max_xp = max_xp
-        self.min_dmg = min_dmg
-        self.max_dmg = max_dmg
-        self.attack_dice = attack_dice
-        self.dodge_dice = dodge_dice
-        self.weapon = random.choice(WEAPONS[w_start-1:w_end])
-        self.sound = sound
-
     def get_debuff(self):
-        if self.color == 'green':
-            return None
-        else:
-            return self.category[2]
+        return COLORS[self.color][1]
 
     def get_attack_effect(self):
-        if self.color == 'green':
-            return None
-        else:
-            return self.category[1]
-
-    def get_monster_hp(self):
-        self.hp = random.randint(self.min_hp, self.max_hp)
-
-    def get_monster_xp(self):
-        self.xp = random.randint(self.min_xp, self.max_xp)
+        return COLORS[self.color][0]
 
     def on_hit_effect(self, target):
         if self.color != 'green':
-            print(f"\nThe {self.color} {self.__class__.__name__}'s attack "
+            print(f"\nThe {self.color} {self.name}'s attack "
                   + self.attack_effect + "!")
             if not self.debuff in target.status:
                 target.status.append(self.debuff)
@@ -105,22 +89,39 @@ class Monster(Combat):
             elif self.debuff == 'silenced':
                 target.silence_duration = 2
 
+    def get_weapon(self):
+        lst = [wp for lvl in self.allowed_weapons for wp in WEAPONS[lvl]]
+        weapon = random.choice(lst)
+        return weapon()
 
 class Goblin(Monster):
-    pass
+    def __init__(self):
+        super().__init__(hp_min=1, hp_max=2,
+                         xp_min=2, xp_max=3)
+        self.name = 'Goblin'
+        self.allowed_weapons = ["level_0", "level_1"]
+        self.weapon = self.get_weapon()
+
 
 
 class Troll(Monster):
     def __init__(self):
-        Monster.__init__(self)
-        self.get_monster_stats(0, 'bwah', 3, 5, 3, 5, 2, 3, w_end=5)
-        self.get_monster_hp()
-        self.get_monster_xp()
-
+        super().__init__(hp_min=3, hp_max=5,
+                         xp_min=3, xp_max=5)
+        self.name = 'Troll'
+        self.allowed_weapons = ["level_1", "level_2"]
+        self.weapon = self.get_weapon()
+        self.toughness += 1
+        self.attack_power += 1
 
 class Dragon(Monster):
     def __init__(self):
-        Monster.__init__(self)
-        self.get_monster_stats(1, 'grrrrr', 6, 10, 5, 10, 3, 5, w_start=3, w_end=6)
-        self.get_monster_hp()
-        self.get_monster_xp()
+        super().__init__(hp_min=6, hp_max=10,
+                         xp_min=5, xp_max=8)
+        self.name = 'Dragon'
+        while self.color == 'green':
+            self.color = random.choice(list(COLORS.keys()))
+        self.allowed_weapons = ["level_1", "level_2", "level_3"]
+        self.weapon = self.get_weapon()
+        self.toughness += 2
+        self.attack_power += 1
