@@ -73,7 +73,7 @@ class Game:
 
         self.monster_deaths = ["dies!",
                                "screams in agony, and collapses!",
-                               f"takes a fatal blow from your {self.player.weapon}!",
+                               f"takes a fatal blow from your {self.player.weapon.name}!",
                                "succumbs to his wounds!",
                                "runs away in despair, and bleeds to death.",
                                "breathes his last breath... RIP!"]
@@ -83,7 +83,8 @@ class Game:
     # GETS NEXT MONSTER FROM POOL, AND THEN BOSS
     def get_next_monster(self):
         if len(self.monster_pool) > 0:
-            return self.monster_pool.pop(self.monster_pool.index(random.choice(self.monster_pool)))
+            random_monster_id = self.monster_pool.index(random.choice(self.monster_pool))
+            return self.monster_pool.pop(random_monster_id)
         else:
             try:
                 return self.boss.pop(0)
@@ -103,33 +104,36 @@ class Game:
             time.sleep(1.5)
             d = self.monster_deaths.pop(self.monster_deaths.index(random.choice(self.monster_deaths)))
             print(f"{self.monster.battlecry()}! The {self.monster.color} "
-                  f"{self.monster.__class__.__name__} {d}")
+                  f"{self.monster.name} {d}")
 
         # MONSTER ATTACK PHASE
         else:
 
             # IF MONSTER DOES ATTACK
-            if self.monster.attack_hits(self.monster.weapon):
+            if self.monster.hits(self.monster.weapon, self.player):
                 time.sleep(1.5)
-                print(f"The {self.monster.color} {self.monster.__class__.__name__} "
-                      f"attacks you with his {self.monster.weapon}!")
+                print(f"The {self.monster.color} {self.monster.name} "
+                      f"attacks you with his {self.monster.weapon.name}!")
 
                 # HE MAY OR MAY NOT FALL IN THE TRAP
-                if self.player.laid_trap:
-                    if random.randint(0, 100) > 30:
-                        time.sleep(1)
-                        print(f"CLING! The {self.monster.__class__.__name__} "
-                              "steps on the trap, gets stunned and takes 1 damage!")
-                        self.monster.hp -= 1
-                        self.player.laid_trap = False
-                        return
+                try:
+                    if self.player.laid_trap:
+                        if random.randint(0, 100) > 30:
+                            time.sleep(1)
+                            print(f"CLING! The {self.monster.name} "
+                                "steps on the trap, gets stunned and takes 1 damage!")
+                            self.monster.hp -= 1
+                            self.player.laid_trap = False
+                            return
+                except AttributeError:
+                    pass
 
                 # IF ATTACK GOES THROUGH, PLAYER TRIES TO DODGE
                 time.sleep(1.5)
                 print("\nYou try to dodge the attack...", end='')
 
                 # DODGE SUCCESSFUL = END MONSTER'S TURN
-                if self.player.dodge(self.player.weapon, self.player):
+                if self.player.dodges(self.player.weapon):
                     time.sleep(0.5)
                     print(" and succeed!")
                     time.sleep(1.5)
@@ -139,10 +143,10 @@ class Game:
                 else:
                     time.sleep(0.5)
                     print(" but you fail!")
-                    dmg = self.monster.get_dmg(self.monster.weapon, self.player)
+                    dmg = self.monster.get_atk_dmg(self.monster.weapon, self.monster)
                     self.player.hp -= dmg
                     time.sleep(1)
-                    print(f"The {self.monster.color} {self.monster.__class__.__name__} "
+                    print(f"The {self.monster.color} {self.monster.name} "
                           f"hits you for {dmg} HP.")
 
                     # MONSTER CAN APPLY ON-HIT EFFECT
@@ -156,7 +160,7 @@ class Game:
 
                 # WARRIOR COUNTER-ATTACK (MIN LVL 2)
                 if self.player.job == "Warrior":
-                    if self.player.xpn > 5:
+                    if self.player.max_xp > 5:
                         if random.randint(0, 100) >= 60:
                             print("\nCounter-attack!")
                             self.player_attack_phase()
@@ -164,7 +168,7 @@ class Game:
             # IF MONSTER DOESN'T ATTACK  
             else:
                 time.sleep(1.5)
-                print(f"The {self.monster.color} {self.monster.__class__.__name__} "
+                print(f"The {self.monster.color} {self.monster.name} "
                       + random.choice(self.monster_actions) + '...')
                 time.sleep(1.5)
 
@@ -177,7 +181,7 @@ class Game:
                     self.player.status.remove('silence')
                 self.player.job = self.player.old_job
                 if self.player.job == "Warrior":
-                    self.player.base_hp = 14
+                    self.player.max_hp = 14
                     if self.player.hp_diff < 0:
                         self.player.hp += 4
         except AttributeError:
@@ -214,7 +218,7 @@ class Game:
                     self.player.spell_1(self.player)
                     self.player.job = self.player.old_job
                     if self.player.job == "Warrior":
-                        self.player.base_hp = 14
+                        self.player.max_hp = 14
                         if self.player.hp_diff < 0:
                             self.player.hp += 4
                     time.sleep(0.5)
@@ -242,8 +246,8 @@ class Game:
                     time.sleep(0.5)
                     print("\nYou're so confused!")
                     time.sleep(0.5)
-                    dmg = self.player.get_dmg(self.player.weapon, self.player)
-                    print(f"You trip and fall down head first on your {self.player.weapon}, "
+                    dmg = self.player.get_atk_dmg(self.player.weapon, self.monster)
+                    print(f"You trip and fall down head first on your {self.player.weapon.name}, "
                           f"hurting yourself for {dmg} damage!")
                     self.player.hp -= dmg
                     time.sleep(1)
@@ -318,13 +322,13 @@ class Game:
         if not self.player.job in ["Warrior", 'Jobless']:
 
             # DISPLAY RELEVANT SPELLS (IF LVL 1, LVL 2, OR LVL 3)
-            if self.player.xpn == 5:
+            if self.player.max_xp == 5:
                 action = input("\n[A]ttack" 
                                f"\n{self.player.spell_1_name} ({self.player.spell_1_casts})"
                                "\n[R]est"
                                "\n[Q]uit\n"
                                "\n> ")
-            elif self.player.xpn == 6:
+            elif self.player.max_xp == 6:
                 action = input("\n[A]ttack"
                                f"\n{self.player.spell_1_name} ({self.player.spell_1_casts})"
                                f"\n{self.player.spell_2_name} ({self.player.spell_2_casts})"
@@ -342,7 +346,7 @@ class Game:
 
         # CASE OF WARRIOR OR 'JOBLESS' (NO ACTIVE SPELL UNTIL LVL 3)
         elif self.player.job == "Warrior":
-            if self.player.xpn > 6:
+            if self.player.max_xp > 6:
                 action = input("\n[A]ttack"
                                f"\n{self.player.spell_3_name} ({self.player.spell_3_casts})"
                                "\n[R]est"
@@ -384,12 +388,15 @@ class Game:
                     print("The fire damage was fatal... You die!")
 
                     # IF PRIEST USED REVIVE
-                    if self.player.revive:
-                        print("RESURRECTION!")
-                        print("The Mighty Gods heard your prayer. You are given another chance.")
-                        self.player.hp += 1
-                        self.player.revive = False
-                        time.sleep(1)
+                    try:
+                        if self.player.revive:
+                            print("RESURRECTION!")
+                            print("The Mighty Gods heard your prayer. You are given another chance.")
+                            self.player.hp += 1
+                            self.player.revive = False
+                            time.sleep(1)
+                    except AttributeError:
+                        pass
 
                     # OTHERWISE
                     else:
@@ -403,9 +410,9 @@ class Game:
                     time.sleep(1.5)
                     if self.player.job == "Warrior":
                             if self.player.hp > 10:
-                                self.player.hp_diff = self.player.hp - self.player.base_hp
+                                self.player.hp_diff = self.player.hp - self.player.max_hp
                                 self.player.hp = 10 + self.player.hp_diff
-                            self.player.base_hp = 10
+                            self.player.max_hp = 10
                     if self.player.job != 'Jobless':
                         self.player.old_job = self.player.job
                         self.player.job = "Jobless"
@@ -413,19 +420,19 @@ class Game:
     # PLAYER PHYSICAL ATTACK PHASE
     def player_attack_phase(self):
         time.sleep(0.5)
-        print(f"\nYou draw your {self.player.weapon} "
-              f"to attack the {self.monster.__class__.__name__}...", end='')
+        print(f"\nYou draw your {self.player.weapon.name} "
+              f"to attack the {self.monster.name}...", end='')
 
         # PLAYER HITS
-        if self.player.attack_hits(self.player.weapon):
+        if self.player.hits(self.player.weapon, self.monster):
             time.sleep(0.5)
             print(" and hit!")
             time.sleep(1)
-            print(f"The {self.monster.__class__.__name__} tries to dodge...", end='')
+            print(f"The {self.monster.name} tries to dodge...", end='')
             sys.stdout.flush()
 
             # MONSTER DODGES
-            if self.monster.dodge(self.monster.weapon, self.player):
+            if self.monster.dodges(self.monster.weapon):
                 time.sleep(0.5)
                 print(" and succeeds!")
 
@@ -433,7 +440,7 @@ class Game:
             else:
                 time.sleep(0.5)
                 print(" but he fails!")
-                dmg = self.player.get_dmg(self.player.weapon, self.player)
+                dmg = self.player.get_atk_dmg(self.player.weapon, self.monster)
                 self.monster.hp -= dmg
                 time.sleep(1)
                 print(f"You hit it for {dmg} HP.")
@@ -460,7 +467,7 @@ class Game:
 
         if self.monster.hp <= 0:
             time.sleep(1.5)
-            print(f"You have defeated the {self.monster.color} {self.monster.__class__.__name__}!")
+            print(f"You have defeated the {self.monster.color} {self.monster.name}!")
             self.player.killed_a_monster = True
             time.sleep(0.5)
             print(f"You gain {self.monster.xp} XP!")
@@ -470,16 +477,18 @@ class Game:
             if self.player.leveled_up():
                 time.sleep(1)
                 if self.player.level == 2:
-                    print("\nLEVEL UP! You gain +1 max. damage, and +2 accuracy!")
-                    self.player.max_dmg += 1
-                    self.player.attack_dice += 2
+                    print("\nLEVEL UP! You gain +1 Attack Power, "
+                          "and +1 Magic Power!")
+                    self.player.attack_power += 1
+                    self.player.magic_power += 1
                     time.sleep(1)
                     print(f"You learn {self.player.spell_2_name}!")
                 time.sleep(1)
                 if self.player.level == 3:
-                    print("\nLEVEL UP! You gain +1 max. damage, and +2 evasion!")
-                    self.player.max_dmg += 1
-                    self.player.dodge_dice += 2
+                    print("\nLEVEL UP! You gain +1 Toughness, "
+                          "and +10% Dodge Chance!")
+                    self.player.toughness += 1
+                    self.player.dodge_chance += 10
                     time.sleep(1)
                     print(f"You learn {self.player.spell_3_name}!")
                 time.sleep(1)

@@ -3,63 +3,27 @@ import character
 
 
 class Combat:
-
     def __init__(self):
-        self.attack_dice = 6
-        self.dodge_dice = 6
-        self.min_dmg = 1
-        self.max_dmg = 1
+        self.hit_chance = 80 
+        self.dodge_chance = 20
+        self.attack_power = 1
+        self.magic_power = 1
+        self.toughness = 0
 
-    def attack_hits(self, weapon):
-        roll = random.randint(1, self.attack_dice)
-        if weapon == 'railgun':
-            pass
-        elif weapon == 'lightsaber':
-            roll += 1
-        elif weapon == 'axe':
-            pass
-        elif weapon == 'dagger':
-            roll += 1
-        elif weapon == 'bow':
-            pass
-        else:
-            pass
-        return roll > 2
+    def hits(self, weapon, target):
+        '''Check if entity hits target using weapon'''
+        return (self.hit_chance > random.randint(1,100) 
+                and weapon.hits
+                and not target.dodges(target.weapon))
 
-    def dodge(self, weapon, player): 
-        roll = random.randint(1, self.dodge_dice)
-        if player.hidden:
-            roll += 1
-        if weapon == 'railgun':
-            roll += 1
-        elif weapon == 'lightsaber':
-            pass
-        elif weapon == 'axe':
-            pass
-        elif weapon == 'dagger':
-            pass
-        elif weapon == 'bow':
-            roll += 1
-        else:
-            pass
-        return roll > 4
+    def dodges(self, weapon): 
+        '''Check if entity dodges an attack, depending on his range'''
+        add_dodge = 0
+        if weapon.is_ranged:
+            add_dodge = 10
+        return self.dodge_chance + add_dodge > random.randint(1,100)
 
-    def get_dmg(self, weapon, player):
-        if weapon == 'railgun':
-            dmg = random.randint(self.min_dmg+1, self.max_dmg+3)
-        elif weapon == 'lightsaber':
-            dmg = random.randint(self.min_dmg, self.max_dmg+2)
-        elif weapon == 'axe':
-            dmg = random.randint(self.min_dmg+1, self.max_dmg+1)
-        elif weapon == 'dagger':
-            dmg = random.randint(self.min_dmg, self.max_dmg+1)
-        elif weapon == 'bow':
-            dmg = random.randint(self.min_dmg, self.max_dmg+1)
-        else:
-            dmg = random.randint(self.min_dmg, self.max_dmg)
-        if player.job == "Hunter" and ( random.randint(1,10) > 7 or player.hidden ):
-            print("*Critical strike!*")
-            player.hidden = False
-            return 2*dmg
-        else:
-            return dmg
+    def get_atk_dmg(self, weapon, target):
+        '''Return damage value depending on entities stats and weapon'''
+        dmg = (weapon.get_dmg() * self.attack_power) - target.toughness
+        return dmg
