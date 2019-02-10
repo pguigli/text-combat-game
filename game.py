@@ -392,7 +392,7 @@ class Game:
                         if self.player.revive:
                             print("RESURRECTION!")
                             print("The Mighty Gods heard your prayer. You are given another chance.")
-                            self.player.hp = randon.randint(2,5)
+                            self.player.hp = random.randint(2,5)
                             self.player.revive = False
                             time.sleep(1)
                     except AttributeError:
