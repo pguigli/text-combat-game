@@ -10,7 +10,6 @@ from weapon import (Axe, Dagger, Bow,
 
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
-
 def show_jobs():
     '''Show information about available jobs'''
     os.system('clear')
@@ -87,9 +86,9 @@ class Character(Fighter):
             f"Weapon: {self.weapon.name}"
             )
         if self.status:
+            statuses = ', '.join([d.name for d in self.status])
             header_string = (
-                f"*** {', '.join(self.status).upper()} *** \n"
-                + header_string)
+                f"*** {statuses.upper()} *** \n" + header_string)
         return header_string
 
     def get_weapon(self):
@@ -122,7 +121,10 @@ class Character(Fighter):
             self.level_up()
 
     def level_up(self):
-        '''Make player more powerful and learn new spells'''
+        '''
+        Increse player characteristics, and make him learn new 
+        spells, depending on current level
+        '''
         if self.level == 2:
             print("\nLEVEL UP! You gain +1 Attack Power, "
                   "and +1 Magic Power!")

@@ -1,14 +1,17 @@
+import random
 import sys
 import time
 
 
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
+
 class Effect:
     def __init__(self, duration=1):
         self.name = 'Effect'
         self.duration = duration
         self.remaining = self.duration
+        self.apply_chance = 60
         self.target = None
         self.source = None
         self.debuff = True
@@ -19,15 +22,18 @@ class Effect:
     
     def apply(self, source, target):
         '''
-        Apply effect from source entity to target entity, 
-        or refresh duration if already present
+        Apply effect, if successful, from source entity
+        to target entity, or refresh duration if already present.
         '''
-        if not self.is_present(target):
-            target.status.append(self)
-            self.source = source
-            self.target = target
-        else:
-            self.remaining = self.duration
+        if self.apply_chance > random.randint(1,100):
+            if not self.is_present(target):
+                target.status.append(self)
+                self.source = source
+                self.target = target
+                print(f"The {self.source.name}'s attack "
+                      f"{self.source.attack_effect}!")
+            else:
+                self.remaining = self.duration
 
     def tick_effect(self):
         '''
@@ -35,21 +41,19 @@ class Effect:
         or dissipate if effect is expiring
         '''
         if self.remaining > 0:
-            self.apply_consequences()
+            self._apply_consequences()
             self.remaining -= 1
         else:
-            self.dissipate()
+            self._dissipate()
 
-    def apply_consequences(self):
+    def _apply_consequences(self):
         '''Activate effect consequences on the entity who has it'''
         pass
 
-    def dissipate(self):
+    def _dissipate(self):
         '''Remove effect from the entity who has it'''
         if self.is_present(self.target):
             self.target.status.remove(self)
-        
-
 
 
 class Burning(Effect):
@@ -59,7 +63,7 @@ class Burning(Effect):
     
     def apply_consequences(self):
         '''Burn target for 1 dmg each turn'''
-        self.target.take_dmg(1, 'burning')
+        self.target.take_dmg(1, source='burning')
         print("You're burning! You take 1 damage.")
         time.sleep(LONG)
 
@@ -71,7 +75,7 @@ class Silenced(Effect):
     
     def apply_consequences(self):
         '''Prevent target from using anything else than "Attack"'''
-        print("XXXXXXXXXXXXXXXXX")
+        print("Applying Silenced")
         time.sleep(LONG)
 
 
@@ -85,7 +89,7 @@ class Confused(Effect):
         Target has 60% chance to hurt itself 
         when attacking or casting a spell
         "'''
-        print("XXXXXXXXXXXXXXXXX")
+        print("Apply Confused")
         time.sleep(LONG)
 
 
@@ -96,5 +100,5 @@ class Frozen(Effect):
 
     def apply_consequences(self):
         '''Prevent target from performing any action'''
-        print("XXXXXXXXXXXXXXXXX")
+        print("Applying Frozen")
         time.sleep(LONG)

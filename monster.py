@@ -45,6 +45,7 @@ DEATH_MESSAGES = [
     "breathes his last... RIP!"
     ]
 
+
 def show_color_help():
     display_help = input("Do you want to learn about monster colors? [y/n]\n> ").lower()
     if display_help == 'y':
@@ -113,17 +114,6 @@ class Monster(Fighter):
         '''Return relevant attack descriptor depending on color'''
         return COLORS[self.color][0]
 
-    def on_hit_effect(self, target):        ### DEPRECATED
-        if self.color != 'green':
-            print(f"\nThe {self.color} {self.name}'s attack "
-                  + self.attack_effect + "!")
-            if not self.debuff in target.status:
-                target.status.append(self.debuff)
-            if self.debuff == 'burning':
-                target.burn_duration = 2
-            elif self.debuff == 'silenced':
-                target.silence_duration = 2
-
     def get_weapon(self):
         lst = [wp for lvl in self.allowed_weapons for wp in WEAPONS[lvl]]
         weapon = random.choice(lst)
@@ -136,13 +126,38 @@ class Monster(Fighter):
 
     def rest(self):
         msg = random.choice(REST_MESSAGES)
-        print(f"\nThe {self.color} {self.name} {msg}, "
-                  "and regenerates 1 HP!")
+        print(f"The {self.color} {self.name} {msg}, "
+              "and regenerates 1 HP!")
         self.heal(1)
-        time.sleep(SHORT)
+        time.sleep(LONG)
 
-    def attack(self, weapon, target):
-        pass
+    def attack(self, target):
+        '''Make monster attack target using weapon.
+        Attacks can hit or miss, and can be dodged.
+        If monster deals damage, he may apply debuff.
+        '''
+        if self.hits(self.weapon, target):
+            print(f"The {self.color} {self.name} attacks!")
+            time.sleep(MEDIUM)
+            print("You try to dodge the attack...", end='')
+            if not target.dodges(target.weapon):
+                time.sleep(SHORT)
+                print(" but you fail!")
+                dmg = self.get_atk_dmg(self.weapon, target)
+                target.take_dmg(dmg)
+                time.sleep(MEDIUM)
+                print(f"The {self.color} {self.name} "
+                      f"hits you for {dmg} HP.")
+                time.sleep(MEDIUM)
+                if self.color != 'green':
+                    self.debuff.apply(self, target)
+            else:
+                time.sleep(SHORT)
+                print(" and succeed!")
+        else:
+            print(f"The {self.color} {self.name} misses his attack!")
+        time.sleep(LONG)
+
 
 class Goblin(Monster):
     def __init__(self):

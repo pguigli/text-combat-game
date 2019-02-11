@@ -138,7 +138,7 @@ class Game:
                     else:
                         time.sleep(0.5)
                         print(" but you fail!")
-                        dmg = self.monster.get_atk_dmg(self.monster.weapon, self.monster)
+                        dmg = self.monster.get_atk_dmg(self.monster.weapon, self.player)
                         self.player.take_dmg(dmg)
                         time.sleep(1)
                         print(f"The {self.monster.color} {self.monster.name} "

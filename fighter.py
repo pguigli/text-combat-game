@@ -43,7 +43,7 @@ class Fighter:
         '''Exit the game'''
         sys.exit()
 
-    def take_dmg(self, damage, source=None):
+    def take_dmg(self, damage, source='combat'):
         '''
         Reduce hp by 'damage' coming from 'source',
         and check for death.
