@@ -31,12 +31,12 @@ class Game:
 
             # PRINT HEADER WITH PLAYER / MONSTER INFO
             os.system('clear')
-            print('='*70)
+            print('='*60)
             print(self.player)
-            print('-'*70)
+            print('-'*60)
             print(self.monster.battlecry(), "\nA wild creature appears:")
             print(self.monster)
-            print('-'*70)
+            print('-'*60)
 
             #PLAYER TURN
             self.player_turn()
@@ -49,7 +49,7 @@ class Game:
             #CLEANUP
             self.cleanup()
             if not self.player.killed_a_monster:
-                print('-'*70)
+                print('-'*60)
                 input('End of turn. Press [Enter] to continue.')
 
         # IF PLAYER REMAINS
@@ -183,8 +183,11 @@ class Game:
         time.sleep(0.5)
 
         # CHECK FOR BURNING STATUS
-        if self.monster.debuff.is_present(self.player):
-            self.monster.debuff.tick()
+        try:
+            if self.monster.debuff.is_present(self.player):
+                self.monster.debuff.tick()
+        except AttributeError:
+            pass
 
         # CHECK FOR FROZEN STATUS (PASS TURN UNLESS PLAYER CURES IT)
         if 'frozen' in self.player.status:
@@ -422,7 +425,7 @@ class Game:
             self.player.check_xp()
 
             self.monster = self.get_next_monster()
-            print('\n'+'='*70)
+            print('\n'+'='*60)
 
             # PRINTS RELEVANT FOOTER
             if len(self.boss) != 0:
