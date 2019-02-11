@@ -1,17 +1,21 @@
 import os
 import random
+import time
 
+from effect import Burning, Confused, Frozen, Silenced
 from fighter import Fighter
 from weapon import (KungFu, Axe, Dagger, Bow,
                     Lightsaber, Railgun)
 
 
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
+
 COLORS = {
     'green': [None, None],
-    'white': ['freezes you', 'frozen'],
-    'red': ['sets you on fire', 'burning'],
-    'spectral': ['confuses you', 'confused'],
-    'black': ['silences you', 'silenced']
+    'white': ['freezes you', Frozen],
+    'red': ['sets you on fire', Burning],
+    'spectral': ['confuses you', Confused],
+    'black': ['silences you', Silenced]
     }
 
 WEAPONS = {
@@ -21,7 +25,7 @@ WEAPONS = {
     'level_3': [Railgun]
     }
 
-SLACK_MESSAGES = [
+REST_MESSAGES = [
     "is in no mood to attack",
     "looks at you with disdain",
     "takes a nap",
@@ -46,23 +50,27 @@ def show_color_help():
     if display_help == 'y':
         os.system('clear')
         print("""\
---------------------------------------------------------------------------------
-Monster colors:
---------------------------------------------------------------------------------
+------------------------------------------------------------------------
+MONSTER COLOR INFORMATION
+------------------------------------------------------------------------
 ◊ Green:    Default color. No special attribute.
 
-◊ Red:      Monster's attacks have a chance to set you on fire;
-            'burning': Player burns for 1 damage each turn, for 2 turns.
+◊ Red:      Monster's attacks may set you on fire;
+            'burning': Burn for 1 damage each turn.
+            Duration: [2 turns]
 
-◊ White:    Monster's attacks have a chance to freeze you;
-            'frozen': Player can't perform any action next turn.
+◊ White:    Monster's attacks may freeze you;
+            'frozen': Can't perform any action.
+            Duration: [1 turn]
 
-◊ Black:    Monster's attacks have a chance to silence you;
-            'silenced': Player loses all of his job attributes for 1 turn.
+◊ Black:    Monster's attacks may silence you;
+            'silenced': Lose all special powers.
+            Duration: [1 turn]
 
-◊ Spectral: Monster's attacks have a chance to confuse you;
-            'confused': Player has a 50% to hurt himself next time he attacks.
---------------------------------------------------------------------------------""")
+◊ Spectral: Monster's attacks may confuse you;
+            'confused': Chance to hurt yourself on attacking / cast
+            Duration: [2 turns]
+------------------------------------------------------------------------""")
 
     elif display_help == 'n' or display_help == '':
         return
@@ -72,13 +80,14 @@ Monster colors:
 
 class Monster(Fighter):
 
-    def __init__(self, hp_min=1, hp_max=1,
-                       xp_min=1, xp_max=2):
+    def __init__(self, min_hp=1, max_hp=1,
+                       min_xp=1, max_xp=2):
         super().__init__()
         self.name = 'Monster'
         self.sound = 'roar'
-        self.hp = random.randint(hp_min, hp_max)
-        self.xp = random.randint(xp_min, xp_max)
+        self.hp = random.randint(min_hp, max_hp)
+        self.max_hp = max_hp
+        self.xp = random.randint(min_xp, max_xp)
         self.color = random.choice(list(COLORS.keys()))
         self.attack_effect = self.get_attack_effect()
         self.debuff = self.get_debuff()
@@ -90,15 +99,21 @@ class Monster(Fighter):
                 f"HP: {self.hp}, XP: {self.xp}, Weapon: {self.weapon.name}")
 
     def battlecry(self):
+        '''Return monster battlecry'''
         return self.sound.upper() + "!"
 
     def get_debuff(self):
-        return COLORS[self.color][1]
+        '''Get relevant power depending on monster color'''
+        if self.color == 'green':
+            return None
+        else:
+            return COLORS[self.color][1]()
 
     def get_attack_effect(self):
+        '''Return relevant attack descriptor depending on color'''
         return COLORS[self.color][0]
 
-    def on_hit_effect(self, target):
+    def on_hit_effect(self, target):        ### DEPRECATED
         if self.color != 'green':
             print(f"\nThe {self.color} {self.name}'s attack "
                   + self.attack_effect + "!")
@@ -114,16 +129,25 @@ class Monster(Fighter):
         weapon = random.choice(lst)
         return weapon()
 
-    def die(self, cause='.'):
+    def die(self, cause=None):
         '''Print monster death message'''
         message = random.choice(DEATH_MESSAGES)
-        print(f"The {self.color} {self.name} {message}.")
+        print(f"{self.battlecry()}! The {self.color} {self.name} {message}.")
 
+    def rest(self):
+        msg = random.choice(REST_MESSAGES)
+        print(f"\nThe {self.color} {self.name} {msg}, "
+                  "and regenerates 1 HP!")
+        self.heal(1)
+        time.sleep(SHORT)
+
+    def attack(self, weapon, target):
+        pass
 
 class Goblin(Monster):
     def __init__(self):
-        super().__init__(hp_min=1, hp_max=2,
-                         xp_min=2, xp_max=3)
+        super().__init__(min_hp=1, max_hp=2,
+                         min_xp=2, max_xp=3)
         self.name = 'Goblin'
         self.allowed_weapons = ["level_0", "level_1"]
         self.weapon = self.get_weapon()
@@ -131,8 +155,8 @@ class Goblin(Monster):
 
 class Troll(Monster):
     def __init__(self):
-        super().__init__(hp_min=3, hp_max=5,
-                         xp_min=3, xp_max=5)
+        super().__init__(min_hp=3, max_hp=5,
+                         min_xp=3, max_xp=5)
         self.name = 'Troll'
         self.allowed_weapons = ["level_1", "level_2"]
         self.weapon = self.get_weapon()
@@ -142,8 +166,8 @@ class Troll(Monster):
 
 class Dragon(Monster):
     def __init__(self):
-        super().__init__(hp_min=6, hp_max=10,
-                         xp_min=5, xp_max=8)
+        super().__init__(min_hp=6, max_hp=10,
+                         min_xp=5, max_xp=8)
         self.name = 'Dragon'
         while self.color == 'green':
             self.color = random.choice(list(COLORS.keys()))

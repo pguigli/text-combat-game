@@ -11,6 +11,7 @@ class Fighter:
         self.toughness = 0
         self.hidden = None
         self.hp = None
+        self.max_hp = None
 
     def hits(self, weapon, target):
         '''Check if entity hits target using weapon'''
@@ -42,10 +43,20 @@ class Fighter:
         '''Exit the game'''
         sys.exit()
 
-    def take_dmg(self, damage, source):
-        '''Reduce hp by 'damage' coming from 'source', and check for death.'''
+    def take_dmg(self, damage, source=None):
+        '''
+        Reduce hp by 'damage' coming from 'source',
+        and check for death.
+        '''
         if damage < self.hp:
             self.hp -= damage
         else:
             self.hp = 0
             self.die(cause=source)
+
+    def heal(self, amount):
+        '''Increase hp by 'amount', but can't go past the maximum'''
+        if self.hp <= (self.max_hp - amount):
+            self.hp += amount
+        else:
+            self.hp = self.max_hp

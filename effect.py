@@ -2,8 +2,7 @@ import sys
 import time
 
 
-MEDIUM = 1
-LONG = 1.5
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 class Effect:
     def __init__(self, duration=1):
@@ -32,7 +31,7 @@ class Effect:
 
     def tick_effect(self):
         '''
-        Tick effect for the number of remaining turns, 
+        Tick effect, if present, for the number of remaining turns, 
         or dissipate if effect is expiring
         '''
         if self.remaining > 0:
@@ -59,7 +58,7 @@ class Burning(Effect):
         self.name = 'Burning'
     
     def apply_consequences(self):
-        '''Burn for 1 dmg each turn'''
+        '''Burn target for 1 dmg each turn'''
         self.target.take_dmg(1, 'burning')
         print("You're burning! You take 1 damage.")
         time.sleep(LONG)
@@ -75,5 +74,27 @@ class Silenced(Effect):
         print("XXXXXXXXXXXXXXXXX")
         time.sleep(LONG)
 
-        
-        
+
+class Confused(Effect):
+    def __init__(self):
+        super().__init__(duration=2)
+        self.name = 'Confused'
+
+    def apply_consequences(self):
+        '''
+        Target has 60% chance to hurt itself 
+        when attacking or casting a spell
+        "'''
+        print("XXXXXXXXXXXXXXXXX")
+        time.sleep(LONG)
+
+
+class Frozen(Effect):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Frozen'
+
+    def apply_consequences(self):
+        '''Prevent target from performing any action'''
+        print("XXXXXXXXXXXXXXXXX")
+        time.sleep(LONG)

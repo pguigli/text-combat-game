@@ -8,6 +8,17 @@ from monster import (Goblin, Troll, Dragon,
                      show_color_help)
 
 
+
+    # def get_available_actions(self):
+    #     '''Return available actions depending on status'''
+    #     actions = [self.attack, self.rest, self.quit_game]
+    #     if 'Silenced' in [d.name for d in self.status]:
+    #         actions.remove(self.rest)
+    #     return [self.attack, self.quit_game]
+
+
+
+
 class Game:
 
     # CORE GAME LOOP
@@ -63,20 +74,6 @@ class Game:
         self.monster_pool = [Goblin(), Goblin(), Goblin(), Troll(), Troll()]
         self.boss = [Dragon()]
         self.monster = self.get_next_monster()
-        self.monster_actions = ["is in no mood to attack",
-                                "looks at you with disdain",
-                                "takes a nap",
-                                "wanders around nervously",
-                                "can't be bothered",
-                                "arrogantly ignores you",
-                                "scratches his nose"]
-
-        self.monster_deaths = ["dies!",
-                               "screams in agony, and collapses!",
-                               f"takes a fatal blow from your {self.player.weapon.name}!",
-                               "succumbs to his wounds!",
-                               "runs away in despair, and bleeds to death.",
-                               "breathes his last breath... RIP!"]
 
         input("Press [Enter] to start the game.")
 
@@ -101,76 +98,69 @@ class Game:
         if 'confused' in self.player.status:
             self.player.status.remove('confused')
 
-        # MONSTER DEATH SCENARIOS
-        if self.monster.hp <= 0:
-            time.sleep(1.5)
-            d = self.monster_deaths.pop(self.monster_deaths.index(random.choice(self.monster_deaths)))
-            print(f"{self.monster.battlecry()}! The {self.monster.color} "
-                  f"{self.monster.name} {d}")
 
         # MONSTER ATTACK PHASE
-        else:
+        if self.monster.hp > 0:
 
             # IF MONSTER DOES ATTACK
-            if self.monster.hits(self.monster.weapon, self.player):
-                time.sleep(1.5)
-                print(f"The {self.monster.color} {self.monster.name} "
-                      f"attacks you with his {self.monster.weapon.name}!")
-
-                # HE MAY OR MAY NOT FALL IN THE TRAP
-                try:
-                    if self.player.laid_trap:
-                        if random.randint(0, 100) > 30:
-                            time.sleep(1)
-                            print(f"CLING! The {self.monster.name} "
-                                "steps on the trap, gets stunned and takes 1 damage!")
-                            self.monster.hp -= 1
-                            self.player.laid_trap = False
-                            return
-                except AttributeError:
-                    pass
-
-                # IF ATTACK GOES THROUGH, PLAYER TRIES TO DODGE
-                time.sleep(1.5)
-                print("\nYou try to dodge the attack...", end='')
-
-                # DODGE SUCCESSFUL = END MONSTER'S TURN
-                if self.player.dodges(self.player.weapon):
-                    time.sleep(0.5)
-                    print(" and succeed!")
+            if random.randint(1,100) > 30:
+            
+                # HE CAN HIT OR MISS
+                if self.monster.hits(self.monster.weapon, self.player):
                     time.sleep(1.5)
-
-                # DODGE FAILS = PROCEED
-                else:
-                    time.sleep(0.5)
-                    print(" but you fail!")
-                    dmg = self.monster.get_atk_dmg(self.monster.weapon, self.monster)
-                    self.player.hp -= dmg
-                    time.sleep(1)
                     print(f"The {self.monster.color} {self.monster.name} "
-                          f"hits you for {dmg} HP.")
+                        f"attacks you with his {self.monster.weapon.name}!")
 
-                    # MONSTER CAN APPLY ON-HIT EFFECT
-                    time.sleep(0.5)
-                    if random.randint(0, 100) > 50:
-                        self.monster.on_hit_effect(self.player)
+                    # HE MAY OR MAY NOT FALL IN THE TRAP
+                    try:
+                        if self.player.laid_trap:
+                            if random.randint(0, 100) > 30:
+                                time.sleep(1)
+                                print(f"CLING! The {self.monster.name} "
+                                    "steps on the trap, gets stunned and takes 1 damage!")
+                                self.monster.hp -= 1
+                                self.player.laid_trap = False
+                                return
+                    except AttributeError:
+                        pass
+
+                    # IF ATTACK GOES THROUGH, PLAYER TRIES TO DODGE
+                    time.sleep(1.5)
+                    print("\nYou try to dodge the attack...", end='')
+
+                    # DODGE SUCCESSFUL = END MONSTER'S TURN
+                    if self.player.dodges(self.player.weapon):
+                        time.sleep(0.5)
+                        print(" and succeed!")
                         time.sleep(1.5)
 
-                    # CHECK FOR SILENCED STATUS
-                    self.apply_debuff('silenced')
+                    # MONSTER ACTUALLY HITS (DODGE FAILS)
+                    else:
+                        time.sleep(0.5)
+                        print(" but you fail!")
+                        dmg = self.monster.get_atk_dmg(self.monster.weapon, self.monster)
+                        self.player.take_dmg(dmg)
+                        time.sleep(1)
+                        print(f"The {self.monster.color} {self.monster.name} "
+                            f"hits you for {dmg} HP.")
 
-                # WARRIOR COUNTER-ATTACK (MIN LVL 2)
-                if self.player.job == "Warrior":
-                    if self.player.max_xp > 5:
-                        if random.randint(0, 100) >= 60:
-                            print("\nCounter-attack!")
-                            self.player_attack_phase()
+                        # MONSTER CAN APPLY ON-HIT EFFECT
+                        time.sleep(0.5)
+                        if random.randint(0, 100) > 50:
+                            self.monster.debuff.apply(self.monster, self.player)
+                            time.sleep(1.5)
 
-            # IF MONSTER DOESN'T ATTACK  
+                    # WARRIOR COUNTER-ATTACK (MIN LVL 2)
+                    if self.player.job == "Warrior":
+                        if self.player.max_xp > 5:
+                            if random.randint(0, 100) >= 60:
+                                print("\nCounter-attack!")
+                                self.player_attack_phase()
+
+            # IF MONSTER DOESN'T ATTACK, HE RESTS  
             else:
                 time.sleep(1.5)
-                print(f"The {self.monster.color} {self.monster.name} "
-                      + random.choice(self.monster_actions) + '...')
+                self.monster.rest()
                 time.sleep(1.5)
 
         # IF PLAYER SPENT 1 TURN SILENCED, RESTORE HIS POWERS
@@ -193,7 +183,8 @@ class Game:
         time.sleep(0.5)
 
         # CHECK FOR BURNING STATUS
-        self.apply_debuff('burning')
+        if self.monster.debuff.is_present(self.player):
+            self.monster.debuff.tick()
 
         # CHECK FOR FROZEN STATUS (PASS TURN UNLESS PLAYER CURES IT)
         if 'frozen' in self.player.status:
@@ -251,7 +242,7 @@ class Game:
                     dmg = self.player.get_atk_dmg(self.player.weapon, self.monster)
                     print(f"You trip and fall down head first on your {self.player.weapon.name}, "
                           f"hurting yourself for {dmg} damage!")
-                    self.player.hp -= dmg
+                    self.player.take_dmg(dmg, source='confused')
                     time.sleep(1)
 
                     # IN CASE PLAYER DIES OF CONFUSION
@@ -369,54 +360,6 @@ class Game:
                 else:
                     self.action_prompt()
 
-    # CHECK FOR 'BURNING' OR 'SILENCED', DEBUFF AND APPLIES THE CONSEQUENCES:
-    def apply_debuff(self, debuff):
-        if debuff in self.player.status:
-
-            # BURNING?
-            if debuff == 'burning':
-                print("You're burning! You take 1 damage.")
-                time.sleep(1.5)
-                self.player.hp -= 1
-                self.player.burn_duration -= 1
-                if self.player.burn_duration == 0:
-                    self.player.status.remove('burning')
-
-                # IN CASE THE BURNING KILLS THE PLAYER
-                if self.player.hp <= 0:
-                    time.sleep(1)
-                    print("The fire damage was fatal... You die!")
-
-                    # IF PRIEST USED REVIVE
-                    try:
-                        if self.player.revive:
-                            print("RESURRECTION!")
-                            print("The Mighty Gods heard your prayer. You are given another chance.")
-                            self.player.hp = random.randint(2,5)
-                            self.player.revive = False
-                            time.sleep(1)
-                    except AttributeError:
-                        pass
-
-                    # OTHERWISE
-                    else:
-                        time.sleep(1)
-                        sys.exit()
-
-            # SILENCED?
-            elif debuff == 'silenced':
-                if self.player.silence_duration == 2:
-                    print("You lose all your special powers!")
-                    time.sleep(1.5)
-                    if self.player.job == "Warrior":
-                            if self.player.hp > 10:
-                                self.player.hp_diff = self.player.hp - self.player.max_hp
-                                self.player.hp = 10 + self.player.hp_diff
-                            self.player.max_hp = 10
-                    if self.player.job != 'Jobless':
-                        self.player.old_job = self.player.job
-                        self.player.job = "Jobless"
-
     # PLAYER PHYSICAL ATTACK PHASE
     def player_attack_phase(self):
         time.sleep(0.5)
@@ -441,7 +384,7 @@ class Game:
                 time.sleep(0.5)
                 print(" but he fails!")
                 dmg = self.player.get_atk_dmg(self.player.weapon, self.monster)
-                self.monster.hp -= dmg
+                self.monster.take_dmg(dmg)
                 time.sleep(1)
                 print(f"You hit it for {dmg} HP.")
 
@@ -476,25 +419,7 @@ class Game:
             self.player.xp += self.monster.xp
 
             # PLAYER LEVELS UP
-            if self.player.leveled_up():
-                time.sleep(1)
-                if self.player.level == 2:
-                    print("\nLEVEL UP! You gain +1 Attack Power, "
-                          "and +1 Magic Power!")
-                    self.player.attack_power += 1
-                    self.player.magic_power += 1
-                    time.sleep(1)
-                    print(f"You learn {self.player.spell_2_name}!")
-                time.sleep(1)
-                if self.player.level == 3:
-                    print("\nLEVEL UP! You gain +1 Toughness, "
-                          "and +10% Dodge Chance!")
-                    self.player.toughness += 1
-                    self.player.dodge_chance += 10
-                    time.sleep(1)
-                    print(f"You learn {self.player.spell_3_name}!")
-                time.sleep(1)
-
+            self.player.check_xp()
 
             self.monster = self.get_next_monster()
             print('\n'+'='*70)

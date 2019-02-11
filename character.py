@@ -8,9 +8,7 @@ from weapon import (Axe, Dagger, Bow,
                     show_weapons)
 
 
-SHORT = 0.5
-MEDIUM = 1
-LONG = 1.5
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 
 def show_jobs():
@@ -78,6 +76,8 @@ class Character(Fighter):
         self.max_hp = 10
         self.xp = 0
         self.max_xp = 5
+        self.spell_2_name = None
+        self.spell_3_name = None
 
     def __str__(self):
         header_string = (
@@ -93,6 +93,7 @@ class Character(Fighter):
         return header_string
 
     def get_weapon(self):
+        '''Let player pick a weapon'''
         choices = {
             'a': Axe,
             'b': Bow,
@@ -112,20 +113,32 @@ class Character(Fighter):
         else:
             return self.get_weapon()
 
-    def rest(self):
-        if self.hp < self.max_hp:
-            self.hp += 1
-            print("\nYou rest, and regenerate 1 HP!")
-        else: 
-            print("\nYou rest, because why not.")
-        time.sleep(SHORT)
-
-    def leveled_up(self):
+    def check_xp(self):
+        '''Check player XP and levels up if he has enough'''
         if self.xp >= self.max_xp:
             self.level += 1
             self.xp -= self.max_xp
             self.max_xp += 1
-            return True
+            self.level_up()
+
+    def level_up(self):
+        '''Make player more powerful and learn new spells'''
+        if self.level == 2:
+            print("\nLEVEL UP! You gain +1 Attack Power, "
+                  "and +1 Magic Power!")
+            self.attack_power += 1
+            self.magic_power += 1
+            time.sleep(MEDIUM)
+            print(f"You learn {self.spell_2_name}!")
+            time.sleep(MEDIUM)
+        if self.level == 3:
+            print("\nLEVEL UP! You gain +1 Toughness, "
+                  "and +10% Dodge Chance!")
+            self.toughness += 1
+            self.dodge_chance += 10
+            time.sleep(MEDIUM)
+            print(f"You learn {self.spell_3_name}!")
+            time.sleep(MEDIUM)
 
     def die(self, cause='combat'):
         '''Print death message and exit'''
@@ -149,6 +162,18 @@ class Character(Fighter):
         time.sleep(LONG)
         sys.exit()
 
+    def rest(self):
+        print("\nYou rest, and regenerate 1 HP!")
+        self.heal(1)
+        time.sleep(SHORT)
+
+    def attack(self, weapon, target):
+        pass
+
+    def quit_game(self):
+        time.sleep(0.5)
+        print("\nYou flee like a coward!")
+        sys.exit()
 
 class Warrior(Character):
     def __init__(self):
@@ -209,6 +234,9 @@ class Sorcerer(Character):
         print(f"You blast {target.color} {target.name} "
               f"and inflict a whopping {dmg} damage.")
         target.hp -= dmg
+
+    #def level_up(self):
+        
 
 
 class Priest(Character):
@@ -286,3 +314,23 @@ class Hunter(Character):
         print(f"You fire a deadly shot at the {target.name}! "
               f"You hit it for {dmg} damage.")
         target.hp -= dmg
+
+
+
+# if self.level == 2:
+#             print("\nLEVEL UP! You gain +1 Attack Power, "
+#                     "and +1 Magic Power!")
+#             self.attack_power += 1
+#             self.magic_power += 1
+#             time.sleep(MEDIUM)
+#             print(f"You learn {self.spell_2_name}!")
+#         time.sleep(MEDIUM)
+        
+#         if self.player.level == 3:
+#             print("\nLEVEL UP! You gain +1 Toughness, "
+#                     "and +10% Dodge Chance!")
+#             self.player.toughness += 1
+#             self.player.dodge_chance += 10
+#             time.sleep(MEDIUM)
+#             print(f"You learn {self.player.spell_3_name}!")
+#         time.sleep(MEDIUM)

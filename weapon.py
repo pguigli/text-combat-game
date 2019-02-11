@@ -3,7 +3,7 @@ import random
 import time
 
 
-SHORT = 0.5
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 
 def show_weapons():
