@@ -1,5 +1,6 @@
 import os
 import random
+import sys
 import time
 
 from fighter import Fighter
@@ -125,6 +126,28 @@ class Character(Fighter):
             self.xp -= self.max_xp
             self.max_xp += 1
             return True
+
+    def die(self, cause='combat'):
+        '''Print death message and exit'''
+        messages = {
+            'combat': [
+                "The damage is fatal. You die!",
+                "This is too much to take! You're dead.",
+                "You bleed to death." 
+                ],
+            'burning': [
+                "You burn to death.",
+                "The fire damage is fatal. You're dead."
+                ],
+            'confusion': [
+                "How silly! You killed yourself.",
+                "Bravo! You died of stupidity!"
+                ]
+            }
+        msg = random.choice(messages[cause])
+        print(msg)
+        time.sleep(LONG)
+        sys.exit()
 
 
 class Warrior(Character):

@@ -21,6 +21,26 @@ WEAPONS = {
     'level_3': [Railgun]
     }
 
+SLACK_MESSAGES = [
+    "is in no mood to attack",
+    "looks at you with disdain",
+    "takes a nap",
+    "wanders around nervously",
+    "can't be bothered",
+    "arrogantly ignores you",
+    "scratches his nose"
+    ]
+
+DEATH_MESSAGES = [
+    "dies!",
+    "loses his life.",
+    "meets his Maker; he's in a better place, now."
+    "screams in agony, and collapses!",
+    "succumbs to his wounds!",
+    "runs away in despair, and bleeds to death.",
+    "breathes his last... RIP!"
+    ]
+
 def show_color_help():
     display_help = input("Do you want to learn about monster colors? [y/n]\n> ").lower()
     if display_help == 'y':
@@ -94,6 +114,12 @@ class Monster(Fighter):
         weapon = random.choice(lst)
         return weapon()
 
+    def die(self, cause='.'):
+        '''Print monster death message'''
+        message = random.choice(DEATH_MESSAGES)
+        print(f"The {self.color} {self.name} {message}.")
+
+
 class Goblin(Monster):
     def __init__(self):
         super().__init__(hp_min=1, hp_max=2,
@@ -101,7 +127,6 @@ class Goblin(Monster):
         self.name = 'Goblin'
         self.allowed_weapons = ["level_0", "level_1"]
         self.weapon = self.get_weapon()
-
 
 
 class Troll(Monster):
@@ -113,6 +138,7 @@ class Troll(Monster):
         self.weapon = self.get_weapon()
         self.toughness += 1
         self.attack_power += 1
+
 
 class Dragon(Monster):
     def __init__(self):

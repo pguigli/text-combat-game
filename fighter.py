@@ -1,4 +1,5 @@
 import random
+import sys
 
 
 class Fighter:
@@ -8,6 +9,8 @@ class Fighter:
         self.attack_power = 1
         self.magic_power = 1
         self.toughness = 0
+        self.hidden = None
+        self.hp = None
 
     def hits(self, weapon, target):
         '''Check if entity hits target using weapon'''
@@ -34,3 +37,15 @@ class Fighter:
             pass
         dmg = (weapon.get_dmg() * self.attack_power) - target.toughness
         return dmg
+    
+    def die(self, cause=None):
+        '''Exit the game'''
+        sys.exit()
+
+    def take_dmg(self, damage, source):
+        '''Reduce hp by 'damage' coming from 'source', and check for death.'''
+        if damage < self.hp:
+            self.hp -= damage
+        else:
+            self.hp = 0
+            self.die(cause=source)
