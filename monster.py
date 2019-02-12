@@ -1,5 +1,6 @@
 import os
 import random
+import sys
 import time
 
 from effect import Burning, Confused, Frozen, Silenced
@@ -91,7 +92,8 @@ class Monster(Fighter):
         self.xp = random.randint(min_xp, max_xp)
         self.color = random.choice(list(COLORS.keys()))
         self.attack_effect = self.get_attack_effect()
-        self.debuff = self.get_debuff()
+        self.debuff = self.get_debuff()     #debuff class, not instance
+        self.debuff_chance = 100
         self.allowed_weapons = ["level_0"]
         self.weapon = self.get_weapon()
 
@@ -108,7 +110,27 @@ class Monster(Fighter):
         if self.color == 'green':
             return None
         else:
-            return COLORS[self.color][1]()
+            return COLORS[self.color][1]
+
+    def apply_effect(self, target):
+        '''
+        If successful, apply debuff to target:
+        Check if instances of class self.debuff (the type of debuff
+        corresponding to the monster's color) are present in
+        target's status. If so, refresh their durations.
+        Otherwise, instanciate new debuff and put it on target.
+        '''
+        if self.debuff_chance > random.randint(1,100):
+            _debuffs_present = [debuff for debuff in target.status if 
+                                isinstance(debuff, self.debuff)]
+            if _debuffs_present:
+                for debuff in _debuffs_present:
+                    debuff.remaining = debuff.duration
+                print(f"Refreshed: {debuff.name}")
+                time.sleep(MEDIUM)
+            else:
+                target.status.append(self.debuff(target))
+                print(f"The {self.name}'s attack {self.attack_effect}!")
 
     def get_attack_effect(self):
         '''Return relevant attack descriptor depending on color'''
@@ -140,6 +162,7 @@ class Monster(Fighter):
             print(f"The {self.color} {self.name} attacks!")
             time.sleep(MEDIUM)
             print("You try to dodge the attack...", end='')
+            sys.stdout.flush()
             if not target.dodges(target.weapon):
                 time.sleep(SHORT)
                 print(" but you fail!")
@@ -150,7 +173,7 @@ class Monster(Fighter):
                       f"hits you for {dmg} HP.")
                 time.sleep(MEDIUM)
                 if self.color != 'green':
-                    self.debuff.apply(self, target)
+                    self.apply_effect(target)
             else:
                 time.sleep(SHORT)
                 print(" and succeed!")

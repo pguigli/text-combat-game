@@ -27,17 +27,20 @@ class Fighter:
         return self.dodge_chance + add_dodge > random.randint(1,100)
 
     def get_atk_dmg(self, weapon, target):
-        '''Return damage value depending on entities stats and weapon'''
+        '''
+        Return damage value depending on entities stats and weapon
+        Damage cannot be 0, minimum damage set to 1
+        '''
         try:
             if self.hidden:
                 w_dmg = weapon.get_dmg(will_crit=True)
                 dmg = (w_dmg * self.attack_power) - target.toughness
                 self.hidden = False
-                return dmg
+                return dmg if dmg > 0 else 1
         except AttributeError:
             pass
         dmg = (weapon.get_dmg() * self.attack_power) - target.toughness
-        return dmg
+        return dmg if dmg > 0 else 1
     
     def die(self, cause=None):
         '''Exit the game'''
