@@ -14,13 +14,19 @@ class Fighter:
         self.max_hp = None
 
     def hits(self, weapon, target):
-        '''Check if entity hits target using weapon'''
+        '''
+        Check if entity hits the target using his weapon,
+        based on weapon hit chance, and target dodge chance
+        '''
         return (self.hit_chance > random.randint(1,100) 
                 and weapon.hits
                 and not target.dodges(target.weapon))
 
     def dodges(self, weapon): 
-        '''Check if entity dodges an attack, depending on his range'''
+        '''
+        Check if entity dodges an attack, depending on his 
+        equipped weapon (ranged weapons increase dodge chance)
+        '''
         add_dodge = 0
         if weapon.is_ranged:
             add_dodge = 10

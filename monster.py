@@ -130,6 +130,7 @@ class Monster(Fighter):
                 time.sleep(MEDIUM)
             else:
                 target.status.append(self.debuff(target))
+                time.sleep(SHORT)
                 print(f"The {self.name}'s attack {self.attack_effect}!")
 
     def get_attack_effect(self):
@@ -137,6 +138,10 @@ class Monster(Fighter):
         return COLORS[self.color][0]
 
     def get_weapon(self):
+        '''
+        Instanciate weapon object according to 
+        which ones are allowed, depending on monster type
+        '''
         lst = [wp for lvl in self.allowed_weapons for wp in WEAPONS[lvl]]
         weapon = random.choice(lst)
         return weapon()
@@ -144,41 +149,43 @@ class Monster(Fighter):
     def die(self, cause=None):
         '''Print monster death message'''
         message = random.choice(DEATH_MESSAGES)
-        print(f"{self.battlecry()}! The {self.color} {self.name} {message}.")
+        time.sleep(LONG)
+        print(f"\n{self.battlecry()}! The {self.color} {self.name} {message}.")
 
     def rest(self):
+        '''Print random rest message, and heal monster for 1 hp'''
         msg = random.choice(REST_MESSAGES)
-        print(f"The {self.color} {self.name} {msg}, "
+        print(f"\nThe {self.color} {self.name} {msg}, "
               "and regenerates 1 HP!")
         self.heal(1)
         time.sleep(LONG)
 
     def attack(self, target):
-        '''Make monster attack target using weapon.
-        Attacks can hit or miss, and can be dodged.
-        If monster deals damage, he may apply debuff.
         '''
+        Make monster attack target using weapon.
+        Attacks can: 
+            hit target,
+                dealing damage
+                and try to apply effects
+            miss, if target dodges, and do nothing
+        '''
+        print(f"\nThe {self.color} {self.name} attacks!")
+        time.sleep(MEDIUM)
+        print("You try to dodge the attack...", end='')
+        sys.stdout.flush()
         if self.hits(self.weapon, target):
-            print(f"The {self.color} {self.name} attacks!")
+            time.sleep(SHORT)
+            print(" but you fail!")
+            dmg = self.get_atk_dmg(self.weapon, target)
             time.sleep(MEDIUM)
-            print("You try to dodge the attack...", end='')
-            sys.stdout.flush()
-            if not target.dodges(target.weapon):
-                time.sleep(SHORT)
-                print(" but you fail!")
-                dmg = self.get_atk_dmg(self.weapon, target)
-                target.take_dmg(dmg)
-                time.sleep(MEDIUM)
-                print(f"The {self.color} {self.name} "
-                      f"hits you for {dmg} HP.")
-                time.sleep(MEDIUM)
-                if self.color != 'green':
-                    self.apply_effect(target)
-            else:
-                time.sleep(SHORT)
-                print(" and succeed!")
+            print(f"The {self.color} {self.name} "
+                  f"hits you for {dmg} HP.")
+            target.take_dmg(dmg)
+            if self.color != 'green':
+                self.apply_effect(target)
         else:
-            print(f"The {self.color} {self.name} misses his attack!")
+            time.sleep(SHORT)
+            print(" and succeed!")
         time.sleep(LONG)
 
 

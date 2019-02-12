@@ -1,7 +1,9 @@
+from collections import OrderedDict
 import os
 import random
 import sys
 import time
+
 
 from fighter import Fighter
 from weapon import (Axe, Dagger, Bow,
@@ -77,36 +79,41 @@ class Character(Fighter):
         self.max_xp = 5
         self.spell_2_name = None
         self.spell_3_name = None
+        self.possible_actions = OrderedDict([
+            ('a', ['[A]ttack', self.attack]),
+            ('r', ['[R]est', self.rest]),
+            ('q', ['[Q]uit', self.quit_game])
+            ])
 
     def __str__(self):
-        header_string = (
+        _header_string = (
             f"{self.name}, Level {self.level} {self.job}, "
             f"HP: {self.hp}/{self.max_hp}, "
             f"XP: {self.xp}/{self.max_xp}, "
             f"Weapon: {self.weapon.name}"
             )
         if self.status:
-            statuses = ', '.join([d.name for d in self.status])
-            header_string = (
-                f"*** {statuses.upper()} *** \n" + header_string)
-        return header_string
+            _statuses = ', '.join([d.name for d in self.status])
+            _header_string = (
+                f"*** {_statuses.upper()} *** \n" + _header_string)
+        return _header_string
 
     def get_weapon(self):
         '''Let player pick a weapon'''
-        choices = {
+        _choices = {
             'a': Axe,
             'b': Bow,
             'd': Dagger
             }
         print('Choose your weapon:')
-        weapon_choice = input(
+        _weapon_choice = input(
             "[A]xe, [B]ow, [D]agger, "
             "or [W] to show weapon characteristics\n"
             "> "
             ).lower()
-        if weapon_choice in choices:
-            return choices[weapon_choice]()
-        elif weapon_choice == 'w':
+        if _weapon_choice in _choices:
+            return _choices[_weapon_choice]()
+        elif _weapon_choice == 'w':
             show_weapons()
             return self.get_weapon()
         else:
@@ -160,22 +167,55 @@ class Character(Fighter):
                 ]
             }
         msg = random.choice(messages[cause])
-        print(msg)
+        print("\n"+msg)
         time.sleep(LONG)
         sys.exit()
 
-    def rest(self):
+    def rest(self, target):  # useless but required target argument
+        '''Print heal message and heal player for 1 hp'''
         print("\nYou rest, and regenerate 1 HP!")
         self.heal(1)
         time.sleep(SHORT)
 
-    def attack(self, weapon, target):
-        pass
+    def attack(self, target):
+        '''
+        Player physical attack phase: he can hit or miss 
+        (if target dodges successfully).
+        If attack hits, deal damage, otherwise, carry on.
+        '''
+        print(f"\nYou draw your {self.weapon.name.lower()}...", end='')
+        sys.stdout.flush()
+        if self.hits(self.weapon, target):
+            time.sleep(SHORT)
+            print(f" and hit the {target.name}!")
+            dmg = self.get_atk_dmg(self.weapon, target)
+            time.sleep(MEDIUM)
+            print(f"You deal {dmg} damage to the "
+                  f"{target.color} {target.name}!")
+            target.take_dmg(dmg)
+        else:
+            time.sleep(SHORT)
+            print(f" but the {target.color} {target.name} "
+                  "dodges your attack.")
+        time.sleep(LONG)
 
     def quit_game(self):
         time.sleep(0.5)
         print("\nYou flee like a coward!")
         sys.exit()
+
+    def action_prompt(self):
+        '''
+        Print custom action prompt depending on job.
+        Return action to take (a function).
+        '''
+        for _action in self.possible_actions:
+            print(self.possible_actions[_action][0])
+        _choice = None
+        while _choice not in self.possible_actions:
+            _choice = input("\nWhat will you do? > ").lower()
+        return self.possible_actions[_choice][1]
+
 
 class Warrior(Character):
     def __init__(self):
@@ -237,9 +277,6 @@ class Sorcerer(Character):
               f"and inflict a whopping {dmg} damage.")
         target.hp -= dmg
 
-    #def level_up(self):
-        
-
 
 class Priest(Character):
     def __init__(self):
@@ -292,11 +329,11 @@ class Hunter(Character):
         self.spell_3_casts = 1
 
     def __str__(self):
-        header_string = super().__str__()
+        _header_string = super().__str__()
         if self.hidden:
-            header_string = ("--- Hidden --- \n" 
-                             + header_string)
-        return header_string
+            _header_string = ("--- Hidden --- \n" 
+                             + _header_string)
+        return _header_string
 
 
     def spell_1(self,target):
@@ -316,23 +353,3 @@ class Hunter(Character):
         print(f"You fire a deadly shot at the {target.name}! "
               f"You hit it for {dmg} damage.")
         target.hp -= dmg
-
-
-
-# if self.level == 2:
-#             print("\nLEVEL UP! You gain +1 Attack Power, "
-#                     "and +1 Magic Power!")
-#             self.attack_power += 1
-#             self.magic_power += 1
-#             time.sleep(MEDIUM)
-#             print(f"You learn {self.spell_2_name}!")
-#         time.sleep(MEDIUM)
-        
-#         if self.player.level == 3:
-#             print("\nLEVEL UP! You gain +1 Toughness, "
-#                     "and +10% Dodge Chance!")
-#             self.player.toughness += 1
-#             self.player.dodge_chance += 10
-#             time.sleep(MEDIUM)
-#             print(f"You learn {self.player.spell_3_name}!")
-#         time.sleep(MEDIUM)

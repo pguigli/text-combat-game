@@ -27,7 +27,7 @@ class Weapon:
         self.min_dmg = 1
         self.max_dmg = 1
         self.hit_chance = 80
-        self.crit_chance = 0
+        self.crit_chance = 5
         self.is_ranged = False
         self.debuffs = None
 
@@ -49,11 +49,6 @@ class Weapon:
             print("CRITICAL STRIKE!")
             time.sleep(SHORT)
         return dmg
-
-    # def apply_debuff(self, holder, target):
-    #     if self.hits:
-    #         for debuff in self.debuffs:
-    #             target.debuffs.append(debuff)
 
 
 class KungFu(Weapon):
