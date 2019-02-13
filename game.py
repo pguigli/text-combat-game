@@ -33,10 +33,12 @@ class Game:
         time.sleep(LONG)
         input("Congratulations! You've cleared the dungeon.")
         input("You win!")
+        time.sleep(LONG)
         sys.exit()
 
     def setup(self):
         '''Spawn player, boss, and 5 monsters'''
+        self.endgame = False
         self.player = get_job()
         self.boss = [Dragon()]
         self.monster_pool = [
@@ -116,15 +118,18 @@ class Game:
         if self.boss:
             _remaining = len(self.monster_pool) + len(self.boss)
             input(f"{_remaining} enemies remaining. "
-                  f"Press [Enter] to continue. ")
+                  "Press [Enter] to continue. ")
             return
-        elif self.monster is not None and self.monster.name == "Dragon":
+        elif (not self.endgame and self.monster is not None and
+                 self.monster.name == "Dragon"):
             print("You have awakened the ancient Dragon!")
+            time.sleep(LONG)
             time.sleep(LONG)
             input(f"Brace yourself, {self.player.name}. "
                   "Press [Enter] to go ahead. ")
             self.endgame = True
-
+        elif self.endgame and self.monster is not None:
+            print("Press [Enter] to continue. ")
 
 if __name__ == "__main__":
     Game()

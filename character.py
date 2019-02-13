@@ -163,7 +163,7 @@ class Character(Fighter):
             'combat': [
                 "The damage is fatal. You die!",
                 "This is too much to take! You're dead.",
-                "You bleed to death."
+                "You bleed to death. RIP!",
                 "You were deleted from the game. Adios!" 
                 ],
             'burning': [
@@ -176,6 +176,7 @@ class Character(Fighter):
                 ]
             }
         msg = random.choice(messages[cause])
+        time.sleep(LONG+MEDIUM)
         print("\n"+msg)
         time.sleep(LONG)
         sys.exit()
