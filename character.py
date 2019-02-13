@@ -17,14 +17,14 @@ def show_jobs():
     os.system('clear')
     print("""\
 =========================================================================
-JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
+JOB INFORMATION | Start at L1, and learn a new skill at L2 and L3.
 -------------------------------------------------------------------------
 ◊ [W]arrior:   +1 Toughness, +1 Attack Power
                L1: +4 base HP (Passive)
                L2: Counter-attack (Passive) - An eye for an eye!
                L3: [Z]erker - Deal 2x dmg, but hurt yourself
 
-◊ [S]orcerer:  +2 Magic Power
+◊ [S]orcerer:  +2 Ability Power
                L1: [D]rain Life - Deal dmg, and heal yourself
                L2: [G]reenify - Target loses all special powers
                L3: [B]last - Blast target for +3/+4 dmg
@@ -119,32 +119,40 @@ class Character(Fighter):
         else:
             return self.get_weapon()
 
-    def check_xp(self):
-        '''Check player XP and levels up if he has enough'''
+    def get_xp(self, target):
+        '''
+        Increase player XP by amount given by target.
+        Check player XP and levels up if he has enough.
+        Extra XP from previous level is carried over to the next
+        level, which require 1 more XP every time.
+        '''
+        self.xp += target.xp
+        print(f"\nYou get {target.xp} XP.")
+        time.sleep(MEDIUM)
         if self.xp >= self.max_xp:
             self.level += 1
             self.xp -= self.max_xp
             self.max_xp += 1
-            self.level_up()
+            time.sleep(MEDIUM)
+            print(f"\nDING! You reach Level {self.level}!")
+            self._level_up()
 
-    def level_up(self):
+    def _level_up(self):
         '''
         Increse player characteristics, and make him learn new 
         spells, depending on current level
         '''
         if self.level == 2:
-            print("\nLEVEL UP! You gain +1 Attack Power, "
-                  "and +1 Magic Power!")
             self.attack_power += 1
-            self.magic_power += 1
+            self.ability_power += 1
+            print("\nYou gain +1 Attack Power, and +1 Ability Power!")
             time.sleep(MEDIUM)
             print(f"You learn {self.spell_2_name}!")
             time.sleep(MEDIUM)
         if self.level == 3:
-            print("\nLEVEL UP! You gain +1 Toughness, "
-                  "and +10% Dodge Chance!")
             self.toughness += 1
             self.dodge_chance += 10
+            print("\nYou gain +1 Toughness, and +10% Dodge Chance!")
             time.sleep(MEDIUM)
             print(f"You learn {self.spell_3_name}!")
             time.sleep(MEDIUM)
@@ -155,7 +163,8 @@ class Character(Fighter):
             'combat': [
                 "The damage is fatal. You die!",
                 "This is too much to take! You're dead.",
-                "You bleed to death." 
+                "You bleed to death."
+                "You were deleted from the game. Adios!" 
                 ],
             'burning': [
                 "You burn to death.",
@@ -244,7 +253,7 @@ class Sorcerer(Character):
     def __init__(self):
         super().__init__()
         self.job = "Sorcerer"
-        self.magic_power += 2
+        self.ability_power += 2
         
         self.spell_1_name = "[D]rain Life"
         self.spell_1_casts = 2

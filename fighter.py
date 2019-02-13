@@ -7,7 +7,7 @@ class Fighter:
         self.hit_chance = 80 
         self.dodge_chance = 20
         self.attack_power = 1
-        self.magic_power = 1
+        self.ability_power = 1
         self.toughness = 0
         self.hidden = None
         self.hp = None
