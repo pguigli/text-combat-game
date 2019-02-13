@@ -6,36 +6,29 @@ SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 
 class Ability:
-    def __init__(self, user):
+    def __init__(self):
         self.name = 'Ability'
-        self.user = user
+        self.user = None
         self.level = 1
         self.number_of_uses = 2
         self.cooldown = 1
         self.timer = 0
         self.miss_chance = 5
+        self.passive = False
 
     def use(self, target):
         '''
-        Activate ability if it is available and has some uses left,
-        then subtract one use. Finally put the ability on cooldown.
+        Activate ability , and subtract one use.
+        Then, put the ability on cooldown.
         '''
-        if self.number_of_uses > 0 and self.timer == 0:
-            self._activate(target)
-            self.number_of_uses -= 1
-            self.timer = self.cooldown
+        self._activate(target)
+        self.number_of_uses -= 1
+        self.timer = self.cooldown
 
     def update_timer(self):
         '''Decrement ability timer (0 means ability is available)'''
         if self.timer > 0:
             self.timer -= 1
-
-
-    
-    
-    def learn(self):
-        if self.user.level >= self.level:
-            pass
 
     def _activate(self, target):
         '''Activate ability effects'''
@@ -62,12 +55,13 @@ class DrainLife(Ability):
     def __init__(self):
         super().__init__()
         self.name = '[D]rain Life'
+        self.key = 'd'
 
     def _activate(self, target):
         dmg = self.get_dmg(target)
         print(f"You leech the {target.color} {target.name}'s "
               f"vital essence, dealing {dmg} damage.")
-        target.take_dmg(dmg)
-        self.user.heal(dmg)
         time.sleep(MEDIUM)
         print(f"You regen {dmg} HP.")
+        target.take_dmg(dmg)
+        self.user.heal(dmg)

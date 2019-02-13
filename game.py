@@ -86,7 +86,8 @@ class Game:
         #         65 > random.randint(1,100):
         #     self.player.action_prompt()(self.player)
         # else:
-        self.player.action_prompt()(self.monster)
+        self.player.get_available_actions()
+        self.player.build_action_prompt()(self.monster)
 
     def monster_turn(self):
         ''' Make monster physically attack (75% chance), or rest.'''

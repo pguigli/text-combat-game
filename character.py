@@ -4,7 +4,7 @@ import random
 import sys
 import time
 
-
+from ability import DrainLife
 from fighter import Fighter
 from weapon import (Axe, Dagger, Bow,
                     show_weapons)
@@ -77,13 +77,9 @@ class Character(Fighter):
         self.max_hp = 10
         self.xp = 0
         self.max_xp = 5
-        self.spell_2_name = None
-        self.spell_3_name = None
-        self.possible_actions = OrderedDict([
-            ('a', ['[A]ttack', self.attack]),
-            ('r', ['[R]est', self.rest]),
-            ('q', ['[Q]uit', self.quit_game])
-            ])
+        self.actions = self.get_available_actions()
+        self.spell_2_name = None ## deprecated
+        self.spell_3_name = None ## deprecated
 
     def __str__(self):
         _header_string = (
@@ -214,17 +210,52 @@ class Character(Fighter):
         print("\nYou flee like a coward!")
         sys.exit()
 
-    def action_prompt(self):
+    def get_available_actions(self, frozen=False, silenced=False):
+        '''
+        Build and return a list of available actions based on player
+        level, and taking into account possible status effects.
+        Each action is a tuple containing:
+            the key to be pressed by player to exectute the action
+            a list containing:
+                the "name" string to be shown on the action prompt
+                the function object to be executed later on
+        '''
+        _actions = []
+        if frozen:
+            _actions.append(('w', ['[W]ait, completely powerless',
+                                       lambda *args: None]))
+        else:
+            _actions.append(('a', ['[A]ttack', self.attack]))
+        if not frozen and not silenced:
+            if self.level >= 1 and not self.ability_1.passive:
+                _actions.append((self.ability_1.key,
+                                    [self.ability_1.name, self.ability_1.use])
+                                    )
+            if self.level >= 2 and not self.ability_2.passive:
+                _actions.append((self.ability_2.key,
+                                    [self.ability_2.name, self.ability_2.use])
+                                    )
+            if self.level >= 3 and not self.ability_3.passive:
+                _actions.append((self.ability_3.key,
+                                    [self.ability_3.name, self.ability_3.use])
+                                    )
+            _actions.append(('r', ['[R]est', self.rest]))
+        _actions.append(('q', ['[Q]uit', self.quit_game]))
+        return OrderedDict(_actions)
+
+    def build_action_prompt(self):
         '''
         Print custom action prompt depending on job.
         Return action to take (a function).
         '''
-        for _action in self.possible_actions:
-            print(self.possible_actions[_action][0])
+        for action in self.actions:
+            print(self.actions[action][0])
         _choice = None
-        while _choice not in self.possible_actions:
+        while _choice not in self.actions:
             _choice = input("\nWhat will you do? > ").lower()
-        return self.possible_actions[_choice][1]
+        return self.actions[_choice][1]
+
+        #if it is available and has some uses left
 
 
 class Warrior(Character):
@@ -252,28 +283,16 @@ class Warrior(Character):
 
 class Sorcerer(Character):
     def __init__(self):
+        self.ability_1 = DrainLife()
+        self.ability_1.user = self
         super().__init__()
         self.job = "Sorcerer"
         self.ability_power += 2
         
-        self.spell_1_name = "[D]rain Life"
-        self.spell_1_casts = 2
         self.spell_2_name = "[G]reenify"
         self.spell_2_casts = 1
         self.spell_3_name = "[B]last"
         self.spell_3_casts = 1
-
-    def spell_1(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target)
-        print(f"You leech {target.color} {target.name}'s life "
-              f"for {dmg} damage.")
-        target.hp -= dmg
-        if self.hp < self.max_hp:
-            print(f"You regen {dmg} hp.") 
-            if self.hp <= self.max_hp - dmg:
-                self.hp += dmg
-            else:
-                self.hp = self.max_hp
 
     def spell_2(self, target):
         if target.color != 'green':
