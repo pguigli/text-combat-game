@@ -17,7 +17,7 @@ def show_jobs():
     os.system('clear')
     print("""\
 =========================================================================
-JOB INFORMATION | Start at L1, and learn a new skill at L2 and L3.
+JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
 -------------------------------------------------------------------------
 ◊ [W]arrior:   +1 Toughness, +1 Attack Power
                L1: +4 base HP (Passive)
