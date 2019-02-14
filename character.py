@@ -309,7 +309,6 @@ class Warrior(Character):
         self.job = "Warrior"
         super().__init__()
         self.hp = 14
-        self.level = 3
         self.max_hp = 14
         self.toughness += 1
         self.attack_power += 1

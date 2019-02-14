@@ -222,7 +222,7 @@ class Dragon(Monster):
         self.sound = "grrrr"
         while self.color == 'green':
             self.color = random.choice(list(COLORS.keys()))
-        self.allowed_weapons = ["level_1", "level_2", "level_3"]
+        self.allowed_weapons = ["level_2", "level_3"]
         self.weapon = self.get_weapon()
         self.toughness += 2
         self.attack_power += 1
