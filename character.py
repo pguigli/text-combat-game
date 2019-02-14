@@ -4,7 +4,10 @@ import random
 import sys
 import time
 
-from ability import (DrainLife, Greenify, Obliterate)
+from ability import (DrainLife, Greenify, Obliterate,
+                     ExtraHP, CounterAttack, Brutalize,
+                     Cleanse, Pray, FinalWish,
+                     Hide, Trap, Snipe)
 from fighter import Fighter
 from weapon import (Axe, Dagger, Bow,
                     show_weapons)
@@ -14,9 +17,9 @@ SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 ABILITIES = {
     'Sorcerer': [DrainLife, Greenify, Obliterate],
-    'Warrior': [],
-    'Hunter': [],
-    'Priest': []
+    'Warrior': [ExtraHP, CounterAttack, Brutalize],
+    'Hunter': [Hide, Trap, Snipe],
+    'Priest': [Cleanse, Pray, FinalWish]
     }
 
 def show_jobs():
@@ -29,7 +32,7 @@ JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
 ◊ [W]arrior:   +1 Toughness, +1 Attack Power
                L1: +4 base HP (Passive)
                L2: Counter-attack (Passive) - An eye for an eye!
-               L3: [Z]erker - Deal 2x dmg, but hurt yourself
+               L3: [B]rutalize - Steal target's weapon and use it!
 
 ◊ [S]orcerer:  +2 Ability Power
                L1: [D]rain Life - Deal dmg, and heal yourself
@@ -81,8 +84,9 @@ class Character(Fighter):
         self.max_hp = 10
         self.xp = 0
         self.max_xp = 5
-        self.weapon = self.get_weapon()
-        self.abilities = {}
+        self.weapon = self._get_weapon()
+        self.abilities = self._get_abilities()
+        self.get_available_actions()
 
     def __str__(self):
         _header_string = (
@@ -97,7 +101,7 @@ class Character(Fighter):
                 f"*** {_statuses.upper()} *** \n" + _header_string)
         return _header_string
 
-    def get_weapon(self):
+    def _get_weapon(self):
         '''Let player pick a weapon'''
         _choices = {
             'a': Axe,
@@ -114,9 +118,9 @@ class Character(Fighter):
             return _choices[_weapon_choice]()
         elif _weapon_choice == 'w':
             show_weapons()
-            return self.get_weapon()
+            return self._get_weapon()
         else:
-            return self.get_weapon()
+            return self._get_weapon()
 
     def get_xp(self, target):
         '''
@@ -147,14 +151,14 @@ class Character(Fighter):
             print("\nYou gain +1 Attack Power, and +1 Ability Power!")
             time.sleep(MEDIUM)
             print(f"You learn {self.abilities['2'].name}!")
-            time.sleep(MEDIUM)
+            time.sleep(LONG)
         if self.level == 3:
             self.toughness += 1
             self.dodge_chance += 10
             print("\nYou gain +1 Toughness, and +10% Dodge Chance!")
             time.sleep(MEDIUM)
             print(f"You learn {self.abilities['3'].name}!")
-            time.sleep(MEDIUM)
+            time.sleep(LONG)
 
     def die(self, cause='combat'):
         '''Print death message and exit'''
@@ -213,7 +217,7 @@ class Character(Fighter):
         print("\nYou flee like a coward!")
         sys.exit()
 
-    def get_abilities(self):
+    def _get_abilities(self):
         '''
         Populate player ability dictionary with instances of ability
         objects, depending on player's job.
@@ -288,43 +292,28 @@ class Character(Fighter):
 
 class Warrior(Character):
     def __init__(self):
-        super().__init__()
         self.job = "Warrior"
+        super().__init__()
         self.hp = 14
+        self.level = 3
         self.max_hp = 14
         self.toughness += 1
         self.attack_power += 1
-        
-        self.spell_2_name = "Counter-Attack"
-        self.spell_3_name = "[Z]erker"
-        self.spell_3_casts = 1
-
-    def spell_3(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target)*2
-        hurt = int(dmg/2)
-        print("You enter a frenzy, "
-              f"dealing {dmg} damage to the {target.name}, "
-              f"and {hurt} to yourself.")
-        target.hp -= dmg
-        self.hp -= hurt
 
 
 class Sorcerer(Character):
     def __init__(self):
-        super().__init__()
         self.job = "Sorcerer"
+        super().__init__()
         self.ability_power += 2
-        self.abilities = self.get_abilities()
-        self.get_available_actions()
 
 
 class Priest(Character):
     def __init__(self):
-        super().__init__()
         self.job = "Priest"
+        super().__init__()
         self.toughness += 1
         self.dodge_chance += 10
-        self.revive = False
 
         self.spell_1_name = "[C]ure"
         self.spell_1_casts = 2
@@ -354,13 +343,11 @@ class Priest(Character):
 
 class Hunter(Character):
     def __init__(self):
-        super().__init__()
         self.job = "Hunter"
+        super().__init__()
         self.hit_chance += 10
         self.dodge_chance += 10
-        self.laid_trap = False
-        self.hidden = False
-        
+
         self.spell_1_name = "[H]ide"
         self.spell_1_casts = 2
         self.spell_2_name = "[T]rap"
@@ -374,7 +361,6 @@ class Hunter(Character):
             _header_string = ("--- Hidden --- \n" 
                              + _header_string)
         return _header_string
-
 
     def spell_1(self,target):
         if not self.hidden:

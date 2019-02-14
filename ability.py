@@ -9,6 +9,7 @@ SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 class Ability:
     def __init__(self):
         self.name = 'Ability'
+        self.key = None
         self.user = None
         self.number_of_uses = 2
         self.cooldown = 1
@@ -121,3 +122,89 @@ class Obliterate(Ability):
         print(f"You inflict a whopping {dmg} damage!")
         time.sleep(MEDIUM)
         target.take_dmg(dmg)
+
+
+class ExtraHP(Ability):
+    def __init__(self):
+        super().__init__()
+        self.is_passive = True
+
+
+class CounterAttack(Ability):
+    '''
+    Give a passive 50% chance to get a free, automatic
+    attack phase, if user was damaged this turn.
+    Only works if player Lvl >= 2, and if he is not Silenced or Frozen.
+    '''
+    
+    def __init__(self):
+        super().__init__()
+        self.name = 'Counter-Attack'
+        self.is_passive = True
+
+    def _activate(self, target):
+        if (self.user.level >= 2 and 50 >= random.randint(1,100) and
+                "Silenced" not in [d.name for d in self.user.status] and
+                "Frozen" not in [d.name for d in self.user.status]):
+            time.sleep(SHORT)
+            print("\nCOUNTER-ATTACK!")
+            time.sleep(MEDIUM)
+            self.user.attack(target)
+
+
+class Brutalize(Ability):
+    '''
+    Permanently disarm target. 
+    Target gets a random Level 0 or Level 1 weapon instead.
+    Then, user attacks target using the stolen weapon (once).
+    This can't be dodged or missed.
+    Of course, it works with all weapons, even reserved.
+    Finally, user gets his original weapon back.
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.name = '[B]rutalize'
+        self.key = 'b'
+        self.number_of_uses = 1
+        self.cooldown = 1
+
+    def _activate(self, target):
+        sys.stdout.flush()
+        stolen_weapon = target.weapon
+        target.allowed_weapons = ["level_0", "level_1"]
+        target.weapon = target.get_weapon()
+        print(f"\nYou leap on the {target.name}, ", end='')
+        time.sleep(MEDIUM)
+        print(f"and brutally disarm the beast!")
+        time.sleep(LONG)
+        print(f"You attack him with his own {stolen_weapon.name}!")
+        time.sleep(LONG)
+        dmg = self.user.get_atk_dmg(stolen_weapon, target)
+        print(f"The {target.color} {target.name} takes {dmg} damage.")
+        target.take_dmg(dmg)
+        time.sleep(LONG)
+
+
+class Cleanse(Ability):
+    pass
+
+
+class Pray(Ability):
+    pass
+
+
+class FinalWish(Ability):
+    pass
+
+
+class Hide(Ability):
+    pass
+
+
+class Trap(Ability):
+    pass
+
+
+class Snipe(Ability):
+    pass

@@ -107,7 +107,10 @@ class Silenced(Effect):
         self.target.toughness = self._pre_silence_stats['toughness']
         if self.target.job == 'Warrior':
             self.target.max_hp = 14
-            self.target.hp += self.extra_hp
+            try:
+                self.target.hp += self.extra_hp
+            except AttributeError:
+                pass
         time.sleep(SHORT)
         _jobize = self.target.job.lower() + 'ize'
         if self.target.job == "Sorcerer":
@@ -137,14 +140,14 @@ class Frozen(Effect):
 
     def _apply_consequences(self):
         '''Prevent target from performing any action at all'''
-        self.target.actions = self.target.get_available_actions(frozen=True)
+        self.target.get_available_actions(frozen=True)
         time.sleep(SHORT)
         print("You are frozen... You can't even move a finger!")
         time.sleep(LONG)
 
     def _clear_effect(self):
         '''Restore all target's available actions'''
-        self.target.actions = self.target.get_available_actions()
+        self.target.get_available_actions()
         time.sleep(SHORT)
         print("\nAs you slowly thaw, you're free to move again!")
         time.sleep(MEDIUM)

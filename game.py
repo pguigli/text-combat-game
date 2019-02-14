@@ -92,10 +92,16 @@ class Game:
         self.player.build_action_prompt()(self.monster)
 
     def monster_turn(self):
-        ''' Make monster physically attack (75% chance), or rest.'''
+        '''
+        Make monster physically attack (75% chance), or rest.
+        Player may "Counter-Attack" if he is a Warrior and meets 
+        the conditions (proper level, and not silenced/frozen).
+        '''
         if not self.monster.just_died:
             if 75 > random.randint(1,100):
                 self.monster.attack(self.player)
+                if self.player.job == 'Warrior':
+                    self.player.abilities['2'].use(self.monster)
             else:
                 self.monster.rest()
 
@@ -107,10 +113,10 @@ class Game:
         Check for player status: apply effects (possibly, 
         remove actions), or make effects expire.
         '''
-        self.player.get_available_actions()
         if self.monster.just_died:
             self.player.get_xp(self.monster)
             self.monster = self.get_next_monster()
+        self.player.get_available_actions()
         if self.player.status:
             for debuff in self.player.status:
                 debuff.tick_effect()
