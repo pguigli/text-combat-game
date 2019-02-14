@@ -75,9 +75,9 @@ class Game:
 
     def player_turn(self):
         '''
+        Update (decrement) all ability timers.
         If Priest is Frozen/Silenced, he can cleanse it, if his Cleanse
         ability is ready and has uses left.
-        Update (decrement) all ability timers.
         Then, prompt for player action.
         Act depending on player choice:
             physical attack,
@@ -89,6 +89,8 @@ class Game:
         #         65 > random.randint(1,100):
         #     self.player.action_prompt()(self.player)
         # else:
+        for ability in self.player.abilities.values():
+            ability.update_timer()
         _effect_names = [d.name for d in self.player.status]
         if (("Frozen" in _effect_names or "Silenced" in _effect_names) and
                 self.player.status and
@@ -102,9 +104,9 @@ class Game:
             time.sleep(SHORT)
             _choice = ''
             if input("Use [C]leanse? [y/n]\n> ").lower() in 'cy':
-                self.player.abilities['1'].use(self)
-        for ability in self.player.abilities.values():
-            ability.update_timer()
+                self.player.abilities['1'].use(self.monster)
+                self.player.get_available_actions()
+        time.sleep(SHORT)
         self.player.build_action_prompt()(self.monster)
 
     def monster_turn(self):
@@ -158,7 +160,7 @@ class Game:
                   "Press [Enter] to go ahead. ")
             self.endgame = True
         elif self.endgame and self.monster is not None:
-            print("Press [Enter] to continue. ")
+            input("Press [Enter] to continue. ")
 
 
 if __name__ == "__main__":

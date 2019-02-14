@@ -161,7 +161,10 @@ class Character(Fighter):
             time.sleep(LONG)
 
     def die(self, cause='combat'):
-        '''Print death message and exit'''
+        '''
+        Print death message and exit
+        Unless player is Priest, and is reviving.
+        '''
         messages = {
             'combat': [
                 "The damage is fatal. You die!",
@@ -182,7 +185,18 @@ class Character(Fighter):
         time.sleep(LONG+MEDIUM)
         print("\n"+msg)
         time.sleep(LONG)
-        sys.exit()
+        if self.job == 'Priest':
+            if self.reviving:
+                print("\nThe Mighty Gods heard your prayer.")
+                time.sleep(SHORT)
+                print("You are given another chance.")
+                time.sleep(SHORT)
+                print("\nRESURRECTION!!!")
+                self.heal(random.randint(6,10))
+                self.reviving = False
+                time.sleep(LONG)
+        else:
+            sys.exit()
 
     def rest(self, target):  # useless but required target argument
         '''Print heal message and heal player for 1 hp'''
@@ -239,7 +253,7 @@ class Character(Fighter):
         '''
         Build and return a list of available actions based on player
         level, and taking into account possible status effects.
-        Action will only be castable if:
+        Action will only be added if:
             its timer is zero (ability not on cooldown)
             it has some uses left
             it is not passive
@@ -314,31 +328,7 @@ class Priest(Character):
         super().__init__()
         self.toughness += 1
         self.dodge_chance += 10
-
-        self.spell_1_name = "[C]ure"
-        self.spell_1_casts = 2
-        self.spell_2_name = "[P]ray"
-        self.spell_2_casts = 3
-        self.spell_3_name = "[F]inal wish"
-        self.spell_3_casts = 1
-
-    def spell_1(self, target):
-        status = ", ".join(self.status)
-        print(f"You cure yourself of all status ailments! (removed: '{status}')")
-        self.status = []
-
-    def spell_2(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target)
-        print(f"You heal yourself for {dmg} hp.")
-        if self.hp <= self.max_hp - dmg:
-            self.hp += dmg
-        else:
-            self.hp = self.max_hp
-
-    def spell_3(self, target):
-        if not self.revive:
-            print("You implore the Gods to grant you a final wish!")
-            self.revive = True
+        self.reviving = False
 
 
 class Hunter(Character):

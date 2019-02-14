@@ -207,6 +207,7 @@ class Troll(Monster):
         super().__init__(min_hp=3, max_hp=5,
                          min_xp=3, max_xp=5)
         self.name = 'Troll'
+        self.sound = 'bwaaah'
         self.allowed_weapons = ["level_1", "level_2"]
         self.weapon = self.get_weapon()
         self.toughness += 1
@@ -218,6 +219,7 @@ class Dragon(Monster):
         super().__init__(min_hp=6, max_hp=10,
                          min_xp=5, max_xp=8)
         self.name = 'Dragon'
+        self.sound = "grrrr"
         while self.color == 'green':
             self.color = random.choice(list(COLORS.keys()))
         self.allowed_weapons = ["level_1", "level_2", "level_3"]

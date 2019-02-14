@@ -84,7 +84,6 @@ class Greenify(Ability):
         self.name = '[G]reenify'
         self.key = 'g'
         self.timer = 0
-        self.number_of_uses = 2
         self.cooldown = 3
 
     def _activate(self, target):
@@ -111,7 +110,6 @@ class Obliterate(Ability):
         self.name = '[O]bliterate'
         self.key = 'o'
         self.number_of_uses = 1
-        self.cooldown = 1
 
     def _activate(self, target):
         _base_dmg = self.get_dmg(target)
@@ -167,7 +165,6 @@ class Brutalize(Ability):
         self.name = '[B]rutalize'
         self.key = 'b'
         self.number_of_uses = 1
-        self.cooldown = 1
 
     def _activate(self, target):
         sys.stdout.flush()
@@ -196,24 +193,55 @@ class Cleanse(Ability):
         super().__init__()
         self.name = '[C]leanse'
         self.key = 'c'
-        self.number_of_uses = 2
         self.cooldown = 2
 
     def _activate(self, target):
         for debuff in self.user.status:
             self.user.status.remove(debuff)
             time.sleep(SHORT)
-            print(f"Removed: {debuff.name}")
-            time.sleep(SHORT)
-            self.user.get_available_actions()
+            print(f"You cleanse yourself of {debuff.name}!\n")
+        time.sleep(SHORT)
 
 
 class Pray(Ability):
-    pass
+    '''
+    Restore some HP to user. 10% chance to crit.
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.name = '[P]ray'
+        self.key = 'p'
+        self.cooldown = 2
+
+    def _activate(self, target):
+        heal = 2 * self.user.ability_power + 1
+        print("You start praying...")
+        time.sleep(LONG)
+        if 10 >= random.randint(1,100):
+            print("CRITICAL!")
+            heal *= 2
+            time.sleep(SHORT)
+        print(f"You heal yourself for {heal} hp.")
+        self.user.heal(heal)
+        time.sleep(LONG)
 
 
 class FinalWish(Ability):
-    pass
+    '''
+    Revive the user next time he dies, with 6-10 hp
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.name = '[F]inal Wish'
+        self.key = 'f'
+        self.number_of_uses = 1
+
+    def _activate(self, target):
+        print("You implore the Gods to grant you a final wish!")
+        self.user.reviving = True
+        time.sleep(LONG)
 
 
 class Hide(Ability):
