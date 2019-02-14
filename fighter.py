@@ -49,8 +49,7 @@ class Fighter:
         return dmg if dmg > 0 else 1
     
     def die(self, cause=None):
-        '''Exit the game'''
-        sys.exit()
+        pass
 
     def take_dmg(self, damage, source='combat'):
         '''

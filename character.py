@@ -4,13 +4,20 @@ import random
 import sys
 import time
 
-from ability import DrainLife
+from ability import (DrainLife, Greenify, Obliterate)
 from fighter import Fighter
 from weapon import (Axe, Dagger, Bow,
                     show_weapons)
 
 
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
+
+ABILITIES = {
+    'Sorcerer': [DrainLife, Greenify, Obliterate],
+    'Warrior': [],
+    'Hunter': [],
+    'Priest': []
+    }
 
 def show_jobs():
     '''Show information about available jobs'''
@@ -27,7 +34,7 @@ JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
 ◊ [S]orcerer:  +2 Ability Power
                L1: [D]rain Life - Deal dmg, and heal yourself
                L2: [G]reenify - Target loses all special powers
-               L3: [B]last - Blast target for +3/+4 dmg
+               L3: [O]bliterate - Deal massive damage
 
 ◊ [P]riest:    +1 Toughness, +10% Dodge Chance
                L1: [C]leanse - Remove all debuffs
@@ -68,18 +75,14 @@ class Character(Fighter):
     def __init__(self):
         super().__init__()
         self.name = input("Character's name:\n> ").strip().title()
-        self.weapon = self.get_weapon()
-        self.job = "Jobless"
-        self.killed_a_monster = False
         self.status = []
         self.level = 1
         self.hp = 10
         self.max_hp = 10
         self.xp = 0
         self.max_xp = 5
-        self.actions = self.get_available_actions()
-        self.spell_2_name = None ## deprecated
-        self.spell_3_name = None ## deprecated
+        self.weapon = self.get_weapon()
+        self.abilities = {}
 
     def __str__(self):
         _header_string = (
@@ -143,14 +146,14 @@ class Character(Fighter):
             self.ability_power += 1
             print("\nYou gain +1 Attack Power, and +1 Ability Power!")
             time.sleep(MEDIUM)
-            print(f"You learn {self.spell_2_name}!")
+            print(f"You learn {self.abilities['2'].name}!")
             time.sleep(MEDIUM)
         if self.level == 3:
             self.toughness += 1
             self.dodge_chance += 10
             print("\nYou gain +1 Toughness, and +10% Dodge Chance!")
             time.sleep(MEDIUM)
-            print(f"You learn {self.spell_3_name}!")
+            print(f"You learn {self.abilities['3'].name}!")
             time.sleep(MEDIUM)
 
     def die(self, cause='combat'):
@@ -210,10 +213,33 @@ class Character(Fighter):
         print("\nYou flee like a coward!")
         sys.exit()
 
+    def get_abilities(self):
+        '''
+        Populate player ability dictionary with instances of ability
+        objects, depending on player's job.
+        Set each ability's user attribute to point to player object.
+        Player abilities attribute looks like: {
+            '1': <Ability1 object>,
+            '2': <Ability2 object>,
+            '3': <Ability3 object>
+            }
+        '''
+        _abilities = {}
+        for index, level in enumerate(['1', '2', '3']):
+            _abilities[level] = ABILITIES[self.job][index]()
+        for ability in _abilities.values():
+            ability.user = self
+        return _abilities
+
     def get_available_actions(self, frozen=False, silenced=False):
         '''
         Build and return a list of available actions based on player
         level, and taking into account possible status effects.
+        Action will only be castable if:
+            its timer is zero (ability not on cooldown)
+            it has some uses left
+            it is not passive
+            player has sufficient level
         Each action is a tuple containing:
             the key to be pressed by player to exectute the action
             a list containing:
@@ -227,21 +253,25 @@ class Character(Fighter):
         else:
             _actions.append(('a', ['[A]ttack', self.attack]))
         if not frozen and not silenced:
-            if self.level >= 1 and not self.ability_1.passive:
-                _actions.append((self.ability_1.key,
-                                    [self.ability_1.name, self.ability_1.use])
-                                    )
-            if self.level >= 2 and not self.ability_2.passive:
-                _actions.append((self.ability_2.key,
-                                    [self.ability_2.name, self.ability_2.use])
-                                    )
-            if self.level >= 3 and not self.ability_3.passive:
-                _actions.append((self.ability_3.key,
-                                    [self.ability_3.name, self.ability_3.use])
-                                    )
+            for (level, ability) in self.abilities.items():
+                if (int(level) <= self.level and
+                        not ability.is_passive and 
+                        ability.timer == 0 and
+                        ability.number_of_uses > 0
+                        ):
+                    _display_name = (
+                        ability.name 
+                        + f" ({ability.number_of_uses})" 
+                        + f" // Cooldown: {ability.cooldown}"
+                        )
+                    _actions.append((
+                        ability.key,
+                        [_display_name, ability.use]
+                        ))
             _actions.append(('r', ['[R]est', self.rest]))
+
         _actions.append(('q', ['[Q]uit', self.quit_game]))
-        return OrderedDict(_actions)
+        self.actions = OrderedDict(_actions)
 
     def build_action_prompt(self):
         '''
@@ -254,8 +284,6 @@ class Character(Fighter):
         while _choice not in self.actions:
             _choice = input("\nWhat will you do? > ").lower()
         return self.actions[_choice][1]
-
-        #if it is available and has some uses left
 
 
 class Warrior(Character):
@@ -283,28 +311,11 @@ class Warrior(Character):
 
 class Sorcerer(Character):
     def __init__(self):
-        self.ability_1 = DrainLife()
-        self.ability_1.user = self
         super().__init__()
         self.job = "Sorcerer"
         self.ability_power += 2
-        
-        self.spell_2_name = "[G]reenify"
-        self.spell_2_casts = 1
-        self.spell_3_name = "[B]last"
-        self.spell_3_casts = 1
-
-    def spell_2(self, target):
-        if target.color != 'green':
-            print(f"You cast Greenify! The {target.color} {target.name} "
-                  "becomes green and loses all his powers.")
-            setattr(target, "color", "green")
-
-    def spell_3(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target) + random.randint(3,4)
-        print(f"You blast {target.color} {target.name} "
-              f"and inflict a whopping {dmg} damage.")
-        target.hp -= dmg
+        self.abilities = self.get_abilities()
+        self.get_available_actions()
 
 
 class Priest(Character):

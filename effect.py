@@ -81,7 +81,7 @@ class Silenced(Effect):
             'ability': self.target.ability_power,
             'toughness': self.target.toughness
             }
-        self.target.actions = self.target.get_available_actions(silenced=True)
+        self.target.get_available_actions(silenced=True)
         self.target.hit_chance = 80
         self.target.dodge_chance = 20
         self.target.attack_power = 1
@@ -99,7 +99,7 @@ class Silenced(Effect):
 
     def _clear_effect(self):
         '''Restore all target's available actions and stats'''
-        self.target.actions = self.target.get_available_actions()
+        self.target.get_available_actions()
         self.target.hit_chance = self._pre_silence_stats['hit']
         self.target.dodge_chance = self._pre_silence_stats['dodge']
         self.target.attack_power = self._pre_silence_stats['attack']
@@ -109,7 +109,10 @@ class Silenced(Effect):
             self.target.max_hp = 14
             self.target.hp += self.extra_hp
         time.sleep(SHORT)
-        print(f"\nYou finally remember how to {self.target.job}.")
+        _jobize = self.target.job.lower() + 'ize'
+        if self.target.job == "Sorcerer":
+            _jobize = "sorcerize"
+        print(f"\nYou finally remember how to {_jobize}.")
         time.sleep(MEDIUM)
 
 

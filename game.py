@@ -31,8 +31,8 @@ class Game:
             self.print_footer()
 
         time.sleep(LONG)
-        input("Congratulations! You've cleared the dungeon.")
-        input("You win!")
+        input("Congratulations! You've cleared the dungeon. > ")
+        print("You win!")
         time.sleep(LONG)
         sys.exit()
 
@@ -75,7 +75,8 @@ class Game:
 
     def player_turn(self):
         '''
-        Prompt for player action.
+        Update (decrement) all ability timers.
+        Then, prompt for player action.
         Act depending on player choice:
             physical attack,
             spell cast,
@@ -86,7 +87,8 @@ class Game:
         #         65 > random.randint(1,100):
         #     self.player.action_prompt()(self.player)
         # else:
-        self.player.get_available_actions()
+        for ability in self.player.abilities.values():
+            ability.update_timer()
         self.player.build_action_prompt()(self.monster)
 
     def monster_turn(self):
@@ -99,16 +101,20 @@ class Game:
 
     def cleanup(self):
         '''
-        Check for player status: apply consequences or expire.
         Check for dead monster. Give xp and level player up.
         Get next monster.
+        Generate all player's available actions.
+        Check for player status: apply effects (possibly, 
+        remove actions), or make effects expire.
         '''
-        if self.player.status:
-            for debuff in self.player.status:
-                debuff.tick_effect()
+        self.player.get_available_actions()
         if self.monster.just_died:
             self.player.get_xp(self.monster)
             self.monster = self.get_next_monster()
+        if self.player.status:
+            for debuff in self.player.status:
+                debuff.tick_effect()
+
 
     def print_footer(self):
         '''
@@ -131,6 +137,7 @@ class Game:
             self.endgame = True
         elif self.endgame and self.monster is not None:
             print("Press [Enter] to continue. ")
+
 
 if __name__ == "__main__":
     Game()

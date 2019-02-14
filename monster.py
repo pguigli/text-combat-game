@@ -12,10 +12,6 @@ from weapon import (KungFu, Axe, Dagger, Bow,
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 COLORS = {
-    'green': [None, None],
-    'white': ['freezes you', Frozen],
-    'red': ['sets you on fire', Burning],
-    'spectral': ['confuses you', Confused],
     'black': ['silences you', Silenced]
     }
 
