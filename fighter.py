@@ -7,7 +7,7 @@ class Fighter:
         self.hit_chance = 80 
         self.dodge_chance = 20
         self.attack_power = 1
-        self.magic_power = 1
+        self.ability_power = 1
         self.toughness = 0
         self.hidden = None
         self.hp = None
@@ -49,8 +49,7 @@ class Fighter:
         return dmg if dmg > 0 else 1
     
     def die(self, cause=None):
-        '''Exit the game'''
-        sys.exit()
+        pass
 
     def take_dmg(self, damage, source='combat'):
         '''

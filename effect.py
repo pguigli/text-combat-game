@@ -1,7 +1,8 @@
-from collections import OrderedDict
 import random
 import sys
 import time
+
+from character import Character
 
 
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
@@ -28,7 +29,6 @@ class Effect:
             #input(f"Status before: {self.target.status}")
             self._clear_effect()
             self.target.status.remove(self)
-            print(f"{self.name} expired.")
             #input(f"Removed {self}")
             #input(f"Status after: {self.target.status}")
             time.sleep(MEDIUM)
@@ -58,7 +58,7 @@ class Burning(Effect):
     def _clear_effect(self):
         '''Print that player is not burning anymore'''
         time.sleep(SHORT)
-        print("Phew! The fire went off.")
+        print("\nPhew! The fire went off.")
         time.sleep(MEDIUM)
 
 
@@ -70,32 +70,52 @@ class Silenced(Effect):
     def _apply_consequences(self):
         '''
         Prevent target from using anything else than "Attack"
-        If target was warrior (+4 base HP), he loses the extra
+        Reset all stats to base stats, temporarily.
+        If target was warrior (+4 base HP), remove the extra
         health too, temporarily. 
         '''
-        if self.target.name == 'Warrior':
+        self._pre_silence_stats = {
+            'hit': self.target.hit_chance,
+            'dodge': self.target.dodge_chance,
+            'attack': self.target.attack_power,
+            'ability': self.target.ability_power,
+            'toughness': self.target.toughness
+            }
+        self.target.get_available_actions(silenced=True)
+        self.target.hit_chance = 80
+        self.target.dodge_chance = 20
+        self.target.attack_power = 1
+        self.target.ability_power = 1
+        self.target.toughness = 0
+        if self.target.job == 'Warrior':
             if self.target.hp > 10:
                 self.extra_hp = self.target.hp - 10
                 self.target.hp = 10
             self.target.max_hp = 10
-        self.before_silenced = self.target.possible_actions
-        self.target.possible_actions = OrderedDict([
-            ('a', ['[A]ttack', self.target.attack]),
-            ('q', ['[Q]uit', self.target.quit_game])
-            ])
         time.sleep(SHORT)
         print("You are silenced! You forget what "
-              f"it means to be a {self.target.name}...")
+              f"it means to be a {self.target.job}...")
         time.sleep(LONG)
 
     def _clear_effect(self):
-        '''Restore all target's available actions'''
-        self.target.possible_actions = self.before_silenced
-        if self.target.name == 'Warrior':
+        '''Restore all target's available actions and stats'''
+        self.target.get_available_actions()
+        self.target.hit_chance = self._pre_silence_stats['hit']
+        self.target.dodge_chance = self._pre_silence_stats['dodge']
+        self.target.attack_power = self._pre_silence_stats['attack']
+        self.target.ability_power = self._pre_silence_stats['ability']
+        self.target.toughness = self._pre_silence_stats['toughness']
+        if self.target.job == 'Warrior':
             self.target.max_hp = 14
-            self.target.hp += self.extra_hp
+            try:
+                self.target.hp += self.extra_hp
+            except AttributeError:
+                pass
         time.sleep(SHORT)
-        print(f"You finally remember how to {self.target.name}.")
+        _jobize = self.target.job.lower() + 'ize'
+        if self.target.job == "Sorcerer":
+            _jobize = "sorcerize"
+        print(f"\nYou finally remember how to {_jobize}.")
         time.sleep(MEDIUM)
 
 
@@ -120,18 +140,14 @@ class Frozen(Effect):
 
     def _apply_consequences(self):
         '''Prevent target from performing any action at all'''
-        self.before_frozen = self.target.possible_actions
-        self.target.possible_actions = OrderedDict([
-            ('w', ['[W]ait, completely powerless', lambda *args: None]),
-            ('q', ['[Q]uit', self.target.quit_game ])
-            ])
+        self.target.get_available_actions(frozen=True)
         time.sleep(SHORT)
         print("You are frozen... You can't even move a finger!")
         time.sleep(LONG)
 
     def _clear_effect(self):
         '''Restore all target's available actions'''
-        self.target.possible_actions = self.before_frozen
+        self.target.get_available_actions()
         time.sleep(SHORT)
-        print("As you slowly thaw, you're free to move again!")
+        print("\nAs you slowly thaw, you're free to move again!")
         time.sleep(MEDIUM)

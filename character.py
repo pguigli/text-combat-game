@@ -4,13 +4,23 @@ import random
 import sys
 import time
 
-
+from ability import (DrainLife, Greenify, Obliterate,
+                     ExtraHP, CounterAttack, Brutalize,
+                     Cleanse, Pray, FinalWish,
+                     Hide, Trap, Snipe)
 from fighter import Fighter
 from weapon import (Axe, Dagger, Bow,
                     show_weapons)
 
 
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
+
+ABILITIES = {
+    'Sorcerer': [DrainLife, Greenify, Obliterate],
+    'Warrior': [ExtraHP, CounterAttack, Brutalize],
+    'Hunter': [Hide, Trap, Snipe],
+    'Priest': [Cleanse, Pray, FinalWish]
+    }
 
 def show_jobs():
     '''Show information about available jobs'''
@@ -22,12 +32,12 @@ JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
 ◊ [W]arrior:   +1 Toughness, +1 Attack Power
                L1: +4 base HP (Passive)
                L2: Counter-attack (Passive) - An eye for an eye!
-               L3: [Z]erker - Deal 2x dmg, but hurt yourself
+               L3: [B]rutalize - Steal target's weapon and use it!
 
-◊ [S]orcerer:  +2 Magic Power
+◊ [S]orcerer:  +2 Ability Power
                L1: [D]rain Life - Deal dmg, and heal yourself
                L2: [G]reenify - Target loses all special powers
-               L3: [B]last - Blast target for +3/+4 dmg
+               L3: [O]bliterate - Deal massive damage
 
 ◊ [P]riest:    +1 Toughness, +10% Dodge Chance
                L1: [C]leanse - Remove all debuffs
@@ -68,22 +78,15 @@ class Character(Fighter):
     def __init__(self):
         super().__init__()
         self.name = input("Character's name:\n> ").strip().title()
-        self.weapon = self.get_weapon()
-        self.job = "Jobless"
-        self.killed_a_monster = False
         self.status = []
         self.level = 1
         self.hp = 10
         self.max_hp = 10
         self.xp = 0
         self.max_xp = 5
-        self.spell_2_name = None
-        self.spell_3_name = None
-        self.possible_actions = OrderedDict([
-            ('a', ['[A]ttack', self.attack]),
-            ('r', ['[R]est', self.rest]),
-            ('q', ['[Q]uit', self.quit_game])
-            ])
+        self.weapon = self._get_weapon()
+        self.abilities = self._get_abilities()
+        self.get_available_actions()
 
     def __str__(self):
         _header_string = (
@@ -98,7 +101,7 @@ class Character(Fighter):
                 f"*** {_statuses.upper()} *** \n" + _header_string)
         return _header_string
 
-    def get_weapon(self):
+    def _get_weapon(self):
         '''Let player pick a weapon'''
         _choices = {
             'a': Axe,
@@ -115,47 +118,59 @@ class Character(Fighter):
             return _choices[_weapon_choice]()
         elif _weapon_choice == 'w':
             show_weapons()
-            return self.get_weapon()
+            return self._get_weapon()
         else:
-            return self.get_weapon()
+            return self._get_weapon()
 
-    def check_xp(self):
-        '''Check player XP and levels up if he has enough'''
+    def get_xp(self, target):
+        '''
+        Increase player XP by amount given by target.
+        Check player XP and levels up if he has enough.
+        Extra XP from previous level is carried over to the next
+        level, which require 1 more XP every time.
+        '''
+        self.xp += target.xp
+        print(f"\nYou get {target.xp} XP.")
+        time.sleep(MEDIUM)
         if self.xp >= self.max_xp:
             self.level += 1
             self.xp -= self.max_xp
             self.max_xp += 1
-            self.level_up()
+            time.sleep(MEDIUM)
+            print(f"\nDING! You reach Level {self.level}!")
+            self._level_up()
 
-    def level_up(self):
+    def _level_up(self):
         '''
         Increse player characteristics, and make him learn new 
         spells, depending on current level
         '''
         if self.level == 2:
-            print("\nLEVEL UP! You gain +1 Attack Power, "
-                  "and +1 Magic Power!")
             self.attack_power += 1
-            self.magic_power += 1
+            self.ability_power += 1
+            print("\nYou gain +1 Attack Power, and +1 Ability Power!")
             time.sleep(MEDIUM)
-            print(f"You learn {self.spell_2_name}!")
-            time.sleep(MEDIUM)
+            print(f"You learn {self.abilities['2'].name}!")
+            time.sleep(LONG)
         if self.level == 3:
-            print("\nLEVEL UP! You gain +1 Toughness, "
-                  "and +10% Dodge Chance!")
             self.toughness += 1
             self.dodge_chance += 10
+            print("\nYou gain +1 Toughness, and +10% Dodge Chance!")
             time.sleep(MEDIUM)
-            print(f"You learn {self.spell_3_name}!")
-            time.sleep(MEDIUM)
+            print(f"You learn {self.abilities['3'].name}!")
+            time.sleep(LONG)
 
     def die(self, cause='combat'):
-        '''Print death message and exit'''
+        '''
+        Print death message and exit
+        Unless player is Priest, and is reviving.
+        '''
         messages = {
             'combat': [
                 "The damage is fatal. You die!",
                 "This is too much to take! You're dead.",
-                "You bleed to death." 
+                "You bleed to death. RIP!",
+                "You were deleted from the game. Adios!" 
                 ],
             'burning': [
                 "You burn to death.",
@@ -167,9 +182,21 @@ class Character(Fighter):
                 ]
             }
         msg = random.choice(messages[cause])
+        time.sleep(LONG+MEDIUM)
         print("\n"+msg)
         time.sleep(LONG)
-        sys.exit()
+        if self.job == 'Priest':
+            if self.reviving:
+                print("\nThe Mighty Gods heard your prayer.")
+                time.sleep(SHORT)
+                print("You are given another chance.")
+                time.sleep(SHORT)
+                print("\nRESURRECTION!!!")
+                self.heal(random.randint(6,10))
+                self.reviving = False
+                time.sleep(LONG)
+        else:
+            sys.exit()
 
     def rest(self, target):  # useless but required target argument
         '''Print heal message and heal player for 1 hp'''
@@ -204,123 +231,113 @@ class Character(Fighter):
         print("\nYou flee like a coward!")
         sys.exit()
 
-    def action_prompt(self):
+    def _get_abilities(self):
+        '''
+        Populate player ability dictionary with instances of ability
+        objects, depending on player's job.
+        Set each ability's user attribute to point to player object.
+        Player abilities attribute looks like: {
+            '1': <Ability1 object>,
+            '2': <Ability2 object>,
+            '3': <Ability3 object>
+            }
+        '''
+        _abilities = {}
+        for index, level in enumerate(['1', '2', '3']):
+            _abilities[level] = ABILITIES[self.job][index]()
+        for ability in _abilities.values():
+            ability.user = self
+        return _abilities
+
+    def get_available_actions(self, frozen=False, silenced=False):
+        '''
+        Build and return a list of available actions based on player
+        level, and taking into account possible status effects.
+        Action will only be added if:
+            its timer is zero (ability not on cooldown)
+            it has some uses left
+            it is not passive
+            player has sufficient level
+        Each action is a tuple containing:
+            the key to be pressed by player to exectute the action
+            a list containing:
+                the "name" string to be shown on the action prompt
+                the function object to be executed later on
+        '''
+        _actions = []
+        if frozen:
+            _actions.append(('w', ['[W]ait, completely powerless',
+                                       lambda *args: None]))
+        else:
+            _actions.append(('a', ['[A]ttack', self.attack]))
+        if not frozen and not silenced:
+            for (level, ability) in self.abilities.items():
+                if (int(level) <= self.level and
+                        not ability.is_passive and 
+                        ability.timer == 0 and
+                        ability.number_of_uses > 0
+                        ):
+                    _display_name = (
+                        ability.name 
+                        + f" ({ability.number_of_uses})" 
+                        + f" // Cooldown: {ability.cooldown}"
+                        )
+                    _actions.append((
+                        ability.key,
+                        [_display_name, ability.use]
+                        ))
+            _actions.append(('r', ['[R]est', self.rest]))
+
+        _actions.append(('q', ['[Q]uit', self.quit_game]))
+        self.actions = OrderedDict(_actions)
+
+    def build_action_prompt(self):
         '''
         Print custom action prompt depending on job.
         Return action to take (a function).
         '''
-        for _action in self.possible_actions:
-            print(self.possible_actions[_action][0])
+        for action in self.actions:
+            print(self.actions[action][0])
         _choice = None
-        while _choice not in self.possible_actions:
+        while _choice not in self.actions:
             _choice = input("\nWhat will you do? > ").lower()
-        return self.possible_actions[_choice][1]
+        return self.actions[_choice][1]
 
 
 class Warrior(Character):
     def __init__(self):
-        super().__init__()
         self.job = "Warrior"
+        super().__init__()
         self.hp = 14
+        self.level = 3
         self.max_hp = 14
         self.toughness += 1
         self.attack_power += 1
-        
-        self.spell_2_name = "Counter-Attack"
-        self.spell_3_name = "[Z]erker"
-        self.spell_3_casts = 1
-
-    def spell_3(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target)*2
-        hurt = int(dmg/2)
-        print("You enter a frenzy, "
-              f"dealing {dmg} damage to the {target.name}, "
-              f"and {hurt} to yourself.")
-        target.hp -= dmg
-        self.hp -= hurt
 
 
 class Sorcerer(Character):
     def __init__(self):
-        super().__init__()
         self.job = "Sorcerer"
-        self.magic_power += 2
-        
-        self.spell_1_name = "[D]rain Life"
-        self.spell_1_casts = 2
-        self.spell_2_name = "[G]reenify"
-        self.spell_2_casts = 1
-        self.spell_3_name = "[B]last"
-        self.spell_3_casts = 1
-
-    def spell_1(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target)
-        print(f"You leech {target.color} {target.name}'s life "
-              f"for {dmg} damage.")
-        target.hp -= dmg
-        if self.hp < self.max_hp:
-            print(f"You regen {dmg} hp.") 
-            if self.hp <= self.max_hp - dmg:
-                self.hp += dmg
-            else:
-                self.hp = self.max_hp
-
-    def spell_2(self, target):
-        if target.color != 'green':
-            print(f"You cast Greenify! The {target.color} {target.name} "
-                  "becomes green and loses all his powers.")
-            setattr(target, "color", "green")
-
-    def spell_3(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target) + random.randint(3,4)
-        print(f"You blast {target.color} {target.name} "
-              f"and inflict a whopping {dmg} damage.")
-        target.hp -= dmg
+        super().__init__()
+        self.ability_power += 2
 
 
 class Priest(Character):
     def __init__(self):
-        super().__init__()
         self.job = "Priest"
+        super().__init__()
         self.toughness += 1
         self.dodge_chance += 10
-        self.revive = False
-
-        self.spell_1_name = "[C]ure"
-        self.spell_1_casts = 2
-        self.spell_2_name = "[P]ray"
-        self.spell_2_casts = 3
-        self.spell_3_name = "[F]inal wish"
-        self.spell_3_casts = 1
-
-    def spell_1(self, target):
-        status = ", ".join(self.status)
-        print(f"You cure yourself of all status ailments! (removed: '{status}')")
-        self.status = []
-
-    def spell_2(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target)
-        print(f"You heal yourself for {dmg} hp.")
-        if self.hp <= self.max_hp - dmg:
-            self.hp += dmg
-        else:
-            self.hp = self.max_hp
-
-    def spell_3(self, target):
-        if not self.revive:
-            print("You implore the Gods to grant you a final wish!")
-            self.revive = True
+        self.reviving = False
 
 
 class Hunter(Character):
     def __init__(self):
-        super().__init__()
         self.job = "Hunter"
+        super().__init__()
         self.hit_chance += 10
         self.dodge_chance += 10
-        self.laid_trap = False
-        self.hidden = False
-        
+
         self.spell_1_name = "[H]ide"
         self.spell_1_casts = 2
         self.spell_2_name = "[T]rap"
@@ -334,7 +351,6 @@ class Hunter(Character):
             _header_string = ("--- Hidden --- \n" 
                              + _header_string)
         return _header_string
-
 
     def spell_1(self,target):
         if not self.hidden:

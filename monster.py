@@ -37,13 +37,13 @@ REST_MESSAGES = [
     ]
 
 DEATH_MESSAGES = [
-    "dies!",
-    "loses his life.",
-    "meets his Maker; he's in a better place, now."
-    "screams in agony, and collapses!",
-    "succumbs to his wounds!",
-    "runs away in despair, and bleeds to death.",
-    "breathes his last... RIP!"
+    " dies!",
+    "'s poor soul finally ascends to the Heavens.",
+    " falls to the ground, lifeless.",
+    " screams in agony, and collapses!",
+    " succumbs to his wounds!",
+    " runs away in despair, and bleeds to death.",
+    " is no more!"
     ]
 
 
@@ -96,6 +96,7 @@ class Monster(Fighter):
         self.debuff_chance = 100
         self.allowed_weapons = ["level_0"]
         self.weapon = self.get_weapon()
+        self.just_died = False
 
     def __str__(self):
         return (f"{self.color.title()} {self.name}, "
@@ -131,7 +132,8 @@ class Monster(Fighter):
             else:
                 target.status.append(self.debuff(target))
                 time.sleep(SHORT)
-                print(f"The {self.name}'s attack {self.attack_effect}!")
+                print(f"\nThe {self.name}'s attack "
+                      f"{self.attack_effect}!")
 
     def get_attack_effect(self):
         '''Return relevant attack descriptor depending on color'''
@@ -150,7 +152,9 @@ class Monster(Fighter):
         '''Print monster death message'''
         message = random.choice(DEATH_MESSAGES)
         time.sleep(LONG)
-        print(f"\n{self.battlecry()}! The {self.color} {self.name} {message}.")
+        print(f"\n{self.battlecry()}! "
+              f"The {self.color} {self.name}{message}")
+        self.just_died = True
 
     def rest(self):
         '''Print random rest message, and heal monster for 1 hp'''
@@ -203,6 +207,7 @@ class Troll(Monster):
         super().__init__(min_hp=3, max_hp=5,
                          min_xp=3, max_xp=5)
         self.name = 'Troll'
+        self.sound = 'bwaaah'
         self.allowed_weapons = ["level_1", "level_2"]
         self.weapon = self.get_weapon()
         self.toughness += 1
@@ -214,6 +219,7 @@ class Dragon(Monster):
         super().__init__(min_hp=6, max_hp=10,
                          min_xp=5, max_xp=8)
         self.name = 'Dragon'
+        self.sound = "grrrr"
         while self.color == 'green':
             self.color = random.choice(list(COLORS.keys()))
         self.allowed_weapons = ["level_1", "level_2", "level_3"]
