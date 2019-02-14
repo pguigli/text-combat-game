@@ -187,7 +187,25 @@ class Brutalize(Ability):
 
 
 class Cleanse(Ability):
-    pass
+    '''
+    Remove all negative effects in user's status.
+    Usable when silenced or frozen.
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.name = '[C]leanse'
+        self.key = 'c'
+        self.number_of_uses = 2
+        self.cooldown = 2
+
+    def _activate(self, target):
+        for debuff in self.user.status:
+            self.user.status.remove(debuff)
+            time.sleep(SHORT)
+            print(f"Removed: {debuff.name}")
+            time.sleep(SHORT)
+            self.user.get_available_actions()
 
 
 class Pray(Ability):

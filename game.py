@@ -7,7 +7,7 @@ from character import get_job
 from monster import Goblin, Troll, Dragon
 
 
-LONG = 1.5
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 
 class Game:
@@ -75,6 +75,8 @@ class Game:
 
     def player_turn(self):
         '''
+        If Priest is Frozen/Silenced, he can cleanse it, if his Cleanse
+        ability is ready and has uses left.
         Update (decrement) all ability timers.
         Then, prompt for player action.
         Act depending on player choice:
@@ -87,6 +89,20 @@ class Game:
         #         65 > random.randint(1,100):
         #     self.player.action_prompt()(self.player)
         # else:
+        _effect_names = [d.name for d in self.player.status]
+        if (("Frozen" in _effect_names or "Silenced" in _effect_names) and
+                self.player.status and
+                self.player.job == "Priest" and
+                self.player.abilities['1'].number_of_uses > 0 and
+                self.player.abilities['1'].timer == 0
+                ):
+            print(f"You are {', '.join(_effect_names)}!")
+            time.sleep(MEDIUM)
+            print("\nLuckily you're a Priest!")
+            time.sleep(SHORT)
+            _choice = ''
+            if input("Use [C]leanse? [y/n]\n> ").lower() in 'cy':
+                self.player.abilities['1'].use(self)
         for ability in self.player.abilities.values():
             ability.update_timer()
         self.player.build_action_prompt()(self.monster)
