@@ -48,7 +48,7 @@ JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
 ◊ [H]unter:    +10% Hit Chance, +10% Dodge Chance
                L1: [H]ide - Boost evasion, next attack/ability will crit 
                L2: [T]rap - Lay a trap that can stun attackers
-               L3: [S]nipe - Shoot using Railgun. Ignore target defense.
+               L3: [S]nipe - Shoot using Railgun. Ignore target defense
 =========================================================================""")
     return get_job()
 

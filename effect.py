@@ -170,7 +170,7 @@ class Hidden(Effect):
         '''
         if not self.target.hidden:
             time.sleep(SHORT)
-            print("You vanish in the shadows.")
+            print("\nYou vanish in the shadows.")
             time.sleep(LONG)
             self.target.hidden = True
             self.old_dodge = self.target.dodge_chance

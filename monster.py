@@ -97,6 +97,7 @@ class Monster(Fighter):
         self.allowed_weapons = ["level_0"]
         self.weapon = self.get_weapon()
         self.just_died = False
+        self.is_stunned = False
 
     def __str__(self):
         return (f"{self.color.title()} {self.name}, "

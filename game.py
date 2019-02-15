@@ -112,12 +112,25 @@ class Game:
     def monster_turn(self):
         '''
         Make monster physically attack (75% chance), or rest.
-        Player may "Counter-Attack" if he is a Warrior and meets 
-        the conditions (proper level, and not silenced/frozen).
+        If monster attacks:
+            - Player may "Counter-Attack" if he is a Warrior and meets 
+              the conditions (proper level, and not silenced/frozen).
+            - Monster may activate hunter's trap. He loses his turn, 
+              and will be stunned next turn.
+        
         '''
         if not self.monster.just_died:
             if 75 > random.randint(1,100):
-                self.monster.attack(self.player)
+                if (self.player.job == 'Hunter' and
+                        self.player.laid_trap and
+                        60 >= random.randint(1,100)):
+                    self.player.abilities['2'].detonate_trap(self.monster)
+                    self.monster.is_stunned = True
+                elif self.monster.is_stunned:
+                    print(f"\nThe {self.monster.name} is stunned.")
+                    time.sleep(MEDIUM)
+                else:
+                    self.monster.attack(self.player)
                 if self.player.job == 'Warrior':
                     self.player.abilities['2'].use(self.monster)
             else:

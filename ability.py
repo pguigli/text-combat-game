@@ -35,8 +35,9 @@ class Ability:
             sys.stdout.flush()
             time.sleep(SHORT)
             print("CRITICAL FAIL!")
-            time.sleep(MEDIUM)
+            time.sleep(LONG)
             print("Damn! You totally messed up!")
+            time.sleep(MEDIUM)
 
     def update_timer(self):
         '''Decrement ability timer (0 means ability is available)'''
@@ -272,7 +273,12 @@ class Hide(Ability):
 
 class Trap(Ability):
     '''
-    XXXXXXX
+    Lay a trap on the ground (usable when hidden).
+    (see game.py for implementation)
+    Next time target attacks, 60% chance to activate the trap:
+        taking normal user attack damage
+        wasting his current turn
+        being unable to do anything next turn
     '''
 
     def __init__(self):
@@ -282,8 +288,19 @@ class Trap(Ability):
         self.number_of_uses = 1
 
     def _activate(self, target):
-        print("You lay a trap on the ground, which does NOTHING YET")
+        print("You lay a trap on the ground.")
+        self.user.laid_trap = True
         time.sleep(LONG)
+    
+    def detonate_trap(self, target):
+        self.user.laid_trap = False
+        print(f"\nCLING! The {target.name} "
+              "steps on the trap and gets stunned!")
+        time.sleep(LONG)
+        dmg = self.user.get_atk_dmg(self.user.weapon, target)
+        time.sleep(MEDIUM)
+        print(f"Your trap deals {dmg} damage!")
+        target.take_dmg(dmg)
 
 
 class Snipe(Ability):
@@ -301,13 +318,13 @@ class Snipe(Ability):
         self.number_of_uses = 1
 
     def _activate(self, target):
+        print("You carefully aim your Railgun shot...", end='')
         sys.stdout.flush()
-        print("You carefully aim your shot...", end='')
         time.sleep(MEDIUM)
         print(" BAM!!!!")
         time.sleep(MEDIUM)
         dmg = self.user.get_atk_dmg(Railgun(), target, pierce=True)
         print(f"You sniped the {target.color} {target.name} "
-              f"for {dmg} damage with your Railgun!")
+              f"for {dmg} damage!!")
         target.take_dmg(dmg)
         time.sleep(LONG)
