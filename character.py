@@ -144,7 +144,7 @@ class Character(Fighter):
 
     def _level_up(self):
         '''
-        Increse player characteristics, and make him learn new 
+        Increase player characteristics, and make him learn new 
         spells, depending on current level
         '''
         if self.level == 2:
@@ -206,11 +206,11 @@ class Character(Fighter):
         if not self.defending:
             print("\nYou take a defensive stance.")
             self.defending = True
-            self.toughness += 3
+            self.toughness += 4
             time.sleep(LONG)
         else:
             self.defending = False
-            self.toughness -= 3
+            self.toughness -= 4
 
     def rest(self, target):     # useless but required target argument
         '''Print heal message and heal player for 1 hp'''
@@ -311,9 +311,9 @@ class Character(Fighter):
                         ability.key,
                         [_display_name, ability.use]
                         ))
+        if not frozen:
             _actions.append(('d', ['[D]efend', self.toggle_defend]))
             _actions.append(('r', ['[R]est', self.rest]))
-
         _actions.append(('q', ['[Q]uit', self.quit_game]))
         self.actions = OrderedDict(_actions)
 

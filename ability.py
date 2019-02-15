@@ -133,7 +133,7 @@ class ExtraHP(Ability):
 
 class CounterAttack(Ability):
     '''
-    Give a passive 50% chance to get a free, automatic
+    Give a passive 35% chance to get a free, automatic
     attack phase, if user was damaged this turn.
     Only works if player Lvl >= 2, and if he is not Silenced or Frozen.
     '''
@@ -144,7 +144,7 @@ class CounterAttack(Ability):
         self.is_passive = True
 
     def _activate(self, target):
-        if (self.user.level >= 2 and 50 >= random.randint(1,100) and
+        if (self.user.level >= 2 and 35 >= random.randint(1,100) and
                 "Silenced" not in [d.name for d in self.user.status] and
                 "Frozen" not in [d.name for d in self.user.status]):
             time.sleep(SHORT)

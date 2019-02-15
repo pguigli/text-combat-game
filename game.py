@@ -107,8 +107,11 @@ class Game:
 
     def monster_turn(self):
         '''
-        Make monster physically attack (75% chance), or rest.
-        If monster attacks:
+        Make monster physically attack (60% chance), 
+        rest (25%), or prepare a devastating attack (15%).
+        If monster prepared his attack: next turn, he will
+        automatically cast prepare again, unleashing the attack.
+        If monster attacks normally:
             - Player may "Counter-Attack" if he is a Warrior and meets 
               the conditions (proper level, and not silenced/frozen).
             - Monster may activate hunter's trap. He loses his turn, 
@@ -116,7 +119,8 @@ class Game:
         
         '''
         if not self.monster.just_died:
-            if 75 > random.randint(1,100):
+            roll = random.randint(1,100)
+            if roll <= 60 and not self.monster.preparing:
                 if (self.player.job == 'Hunter' and
                         self.player.laid_trap and
                         60 >= random.randint(1,100)):
@@ -129,8 +133,10 @@ class Game:
                     self.monster.attack(self.player)
                 if self.player.job == 'Warrior':
                     self.player.abilities['2'].use(self.monster)
-            else:
+            elif 60 < roll <= 85 and not self.monster.preparing:
                 self.monster.rest()
+            else:
+                self.monster.prepare(self.player)
 
     def cleanup(self):
         '''

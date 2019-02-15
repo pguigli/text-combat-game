@@ -98,6 +98,7 @@ class Monster(Fighter):
         self.weapon = self.get_weapon()
         self.just_died = False
         self.is_stunned = False
+        self.preparing = False
 
     def __str__(self):
         return (f"{self.color.title()} {self.name}, "
@@ -191,6 +192,31 @@ class Monster(Fighter):
         else:
             time.sleep(SHORT)
             print(" and succeed!")
+        time.sleep(LONG)
+
+    def prepare(self, target):
+        '''
+        The first time, do nothing, but set a "preparing" flag.
+        The second time, deal target a large amount of damage.
+        Can be missed (15% chance).
+        '''
+        if not self.preparing:
+            print(f"\nThe {self.name} starts concentrating his powers.")
+            self.preparing = True
+        else:
+            print(f"\nThe {self.name} unleashes his fury... ", end='')
+            self.preparing = False
+            sys.stdout.flush()
+            if 85 >= random.randint(1,100):
+                dmg = 2 * self.get_atk_dmg(self.weapon, target)
+                time.sleep(MEDIUM)
+                print(f"You take {dmg} dmg!")
+                target.take_dmg(dmg)
+                if self.color != 'green':
+                    self.apply_effect(target)
+            else:
+                time.sleep(SHORT)
+                print("but misses his attack!")
         time.sleep(LONG)
 
 
