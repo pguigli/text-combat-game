@@ -54,7 +54,7 @@ JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
 
 
 def get_job():
-    '''Create player with chosen job'''
+    '''Instanciate player with chosen role'''
     choices = {
         'w': Warrior,
         's': Sorcerer,
@@ -79,6 +79,7 @@ class Character(Fighter):
     def __init__(self):
         super().__init__()
         self.name = input("Character's name:\n> ").strip().title()
+        self.job = "Jobless"
         self.status = []
         self.level = 1
         self.hp = 10
@@ -86,8 +87,7 @@ class Character(Fighter):
         self.xp = 0
         self.max_xp = 5
         self.weapon = self._get_weapon()
-        self.abilities = self._get_abilities()
-        self.get_available_actions()
+        self.abilities = {}
 
     def __str__(self):
         _header_string = (
@@ -319,37 +319,39 @@ class Character(Fighter):
 
 class Warrior(Character):
     def __init__(self):
-        self.job = "Warrior"
         super().__init__()
+        self.job = "Warrior"
         self.hp = 14
         self.max_hp = 14
         self.toughness += 1
         self.attack_power += 1
+        self.abilities = self._get_abilities()
 
 
 class Sorcerer(Character):
     def __init__(self):
-        self.job = "Sorcerer"
         super().__init__()
+        self.job = "Sorcerer"
         self.ability_power += 2
+        self.abilities = self._get_abilities()
 
 
 class Priest(Character):
     def __init__(self):
-        self.job = "Priest"
         super().__init__()
+        self.job = "Priest"
         self.toughness += 1
         self.dodge_chance += 10
         self.reviving = False
+        self.abilities = self._get_abilities()
 
 
 class Hunter(Character):
     def __init__(self):
-        self.job = "Hunter"
         super().__init__()
+        self.job = "Hunter"
         self.hit_chance += 10
         self.dodge_chance += 10
         self.laid_trap = False
         self.hidden = False
-
-
+        self.abilities = self._get_abilities()

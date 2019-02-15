@@ -89,6 +89,7 @@ class Game:
         #         65 > random.randint(1,100):
         #     self.player.action_prompt()(self.player)
         # else:
+        self.player.get_available_actions()
         for ability in self.player.abilities.values():
             ability.update_timer()
         _effect_names = [d.name for d in self.player.status]
