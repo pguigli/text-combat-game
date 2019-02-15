@@ -136,8 +136,8 @@ class Game:
             self.monster = self.get_next_monster()
         self.player.get_available_actions()
         if self.player.status:
-            for debuff in self.player.status:
-                debuff.tick_effect()
+            for effect in self.player.status:
+                effect.tick_effect()
 
 
     def print_footer(self):

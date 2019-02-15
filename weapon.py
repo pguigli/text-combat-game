@@ -29,7 +29,6 @@ class Weapon:
         self.hit_chance = 80
         self.crit_chance = 5
         self.is_ranged = False
-        self.debuffs = None
 
     @property
     def hits(self):

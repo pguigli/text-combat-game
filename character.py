@@ -8,6 +8,7 @@ from ability import (DrainLife, Greenify, Obliterate,
                      ExtraHP, CounterAttack, Brutalize,
                      Cleanse, Pray, FinalWish,
                      Hide, Trap, Snipe)
+from effect import Hidden
 from fighter import Fighter
 from weapon import (Axe, Dagger, Bow,
                     show_weapons)
@@ -47,7 +48,7 @@ JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
 ◊ [H]unter:    +10% Hit Chance, +10% Dodge Chance
                L1: [H]ide - Boost evasion, next attack/ability will crit 
                L2: [T]rap - Lay a trap that can stun attackers
-               L3: [S]nipe - Deal +3/+4 dmg, and ignore target defense
+               L3: [S]nipe - Shoot using Railgun. Ignore target defense.
 =========================================================================""")
     return get_job()
 
@@ -185,8 +186,8 @@ class Character(Fighter):
         time.sleep(LONG+MEDIUM)
         print("\n"+msg)
         time.sleep(LONG)
-        if self.job == 'Priest':
-            if self.reviving:
+        try:
+            if self.job == 'Priest' and self.reviving:
                 print("\nThe Mighty Gods heard your prayer.")
                 time.sleep(SHORT)
                 print("You are given another chance.")
@@ -195,8 +196,9 @@ class Character(Fighter):
                 self.heal(random.randint(6,10))
                 self.reviving = False
                 time.sleep(LONG)
-        else:
-            sys.exit()
+        except AttributeError:
+            pass
+        sys.exit()
 
     def rest(self, target):  # useless but required target argument
         '''Print heal message and heal player for 1 hp'''
@@ -209,6 +211,7 @@ class Character(Fighter):
         Player physical attack phase: he can hit or miss 
         (if target dodges successfully).
         If attack hits, deal damage, otherwise, carry on.
+        If player was hiding, reveal him.
         '''
         print(f"\nYou draw your {self.weapon.name.lower()}...", end='')
         sys.stdout.flush()
@@ -224,6 +227,16 @@ class Character(Fighter):
             time.sleep(SHORT)
             print(f" but the {target.color} {target.name} "
                   "dodges your attack.")
+        try:
+            if self.hidden:
+                _hidden_effects = [
+                    h for h in self.status if isinstance(h, Hidden)
+                    ]
+                for h in _hidden_effects:
+                    h.clear_effect()
+                    self.status.remove(h)
+        except AttributeError:
+            pass
         time.sleep(LONG)
 
     def quit_game(self):
@@ -336,35 +349,7 @@ class Hunter(Character):
         super().__init__()
         self.hit_chance += 10
         self.dodge_chance += 10
+        self.laid_trap = False
+        self.hidden = False
 
-        self.spell_1_name = "[H]ide"
-        self.spell_1_casts = 2
-        self.spell_2_name = "[T]rap"
-        self.spell_2_casts = 2
-        self.spell_3_name = "[S]nipe"
-        self.spell_3_casts = 1
 
-    def __str__(self):
-        _header_string = super().__str__()
-        if self.hidden:
-            _header_string = ("--- Hidden --- \n" 
-                             + _header_string)
-        return _header_string
-
-    def spell_1(self,target):
-        if not self.hidden:
-            print("Poof! You hide yourself in the shadows.")
-            self.hidden = True
-        else: 
-            print("You are already hiding.")
-            self.spell_1_casts += 1
-
-    def spell_2(self, target):
-        print("You lay a trap on the ground!")
-        self.laid_trap = True
-
-    def spell_3(self, target):
-        dmg = self.get_atk_dmg(self.weapon, target) + 2
-        print(f"You fire a deadly shot at the {target.name}! "
-              f"You hit it for {dmg} damage.")
-        target.hp -= dmg

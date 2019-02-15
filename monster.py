@@ -121,7 +121,7 @@ class Monster(Fighter):
         target's status. If so, refresh their durations.
         Otherwise, instanciate new debuff and put it on target.
         '''
-        if self.debuff_chance > random.randint(1,100):
+        if self.debuff_chance >= random.randint(1,100):
             _debuffs_present = [debuff for debuff in target.status if 
                                 isinstance(debuff, self.debuff)]
             if _debuffs_present:

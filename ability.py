@@ -2,6 +2,8 @@ import random
 import sys
 import time
 
+from effect import Hidden
+from weapon import Railgun
 
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
@@ -185,7 +187,8 @@ class Brutalize(Ability):
 
 class Cleanse(Ability):
     '''
-    Remove all negative effects in user's status.
+    Cancel negative changes made by negative effects.
+    Remove all negative effects from user's status.
     Usable when silenced or frozen.
     '''
 
@@ -196,10 +199,12 @@ class Cleanse(Ability):
         self.cooldown = 2
 
     def _activate(self, target):
-        for debuff in self.user.status:
-            self.user.status.remove(debuff)
-            time.sleep(SHORT)
-            print(f"You cleanse yourself of {debuff.name}!\n")
+        for effect in self.user.status:
+            if effect.is_debuff:
+                self.user.status.clear_effect(effect)
+                self.user.status.remove(effect)
+                time.sleep(SHORT)
+                print(f"You cleansed yourself of {effect.name}!\n")
         time.sleep(SHORT)
 
 
@@ -245,12 +250,64 @@ class FinalWish(Ability):
 
 
 class Hide(Ability):
-    pass
+    '''
+    Hide the user, granting +50% dodge chance.
+    Fade upon attacking, or using Snipe. Fade upon taking damage.
+    Next attack has increased hit chance.
+    Next successful attack will crit.
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.name = '[H]ide'
+        self.key = 'h'
+        self.cooldown = 5
+        self.is_passive = False
+
+    def _activate(self, target):
+        print("You look around to find cover...")
+        self.user.status.append(Hidden(self.user))
+        time.sleep(LONG)
 
 
 class Trap(Ability):
-    pass
+    '''
+    XXXXXXX
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.name = '[T]rap'
+        self.key = 't'
+        self.number_of_uses = 1
+
+    def _activate(self, target):
+        print("You lay a trap on the ground, which does NOTHING YET")
+        time.sleep(LONG)
 
 
 class Snipe(Ability):
-    pass
+    '''
+    Deal damage with Railgun, instead of weapon.
+    Pierce through target's defense (ignore toughness).
+    Always crits if user was hiding.
+    Cancel hiding is user was hidden.
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.name = '[S]nipe'
+        self.key = 's'
+        self.number_of_uses = 1
+
+    def _activate(self, target):
+        sys.stdout.flush()
+        print("You carefully aim your shot...", end='')
+        time.sleep(MEDIUM)
+        print(" BAM!!!!")
+        time.sleep(MEDIUM)
+        dmg = self.user.get_atk_dmg(Railgun(), target, pierce=True)
+        print(f"You sniped the {target.color} {target.name} "
+              f"for {dmg} damage with your Railgun!")
+        target.take_dmg(dmg)
+        time.sleep(LONG)

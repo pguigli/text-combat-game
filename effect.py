@@ -1,8 +1,4 @@
-import random
-import sys
 import time
-
-from character import Character
 
 
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
@@ -14,7 +10,7 @@ class Effect:
         self.duration = duration
         self.target = target
         self.remaining = self.duration
-        self.debuff = True
+        self.is_debuff = True
     
     def tick_effect(self):
         '''
@@ -27,13 +23,13 @@ class Effect:
             #input(f"Remaining: {self.remaining}")
         else:
             #input(f"Status before: {self.target.status}")
-            self._clear_effect()
+            self.clear_effect()
             self.target.status.remove(self)
             #input(f"Removed {self}")
             #input(f"Status after: {self.target.status}")
             time.sleep(MEDIUM)
 
-    def _clear_effect(self):
+    def clear_effect(self):
         '''Cancel any temporary change made by the effect'''
         pass
 
@@ -55,7 +51,7 @@ class Burning(Effect):
         print("You're burning! You take 1 damage.")
         time.sleep(LONG)
 
-    def _clear_effect(self):
+    def clear_effect(self):
         '''Print that player is not burning anymore'''
         time.sleep(SHORT)
         print("\nPhew! The fire went off.")
@@ -97,7 +93,7 @@ class Silenced(Effect):
               f"it means to be a {self.target.job}...")
         time.sleep(LONG)
 
-    def _clear_effect(self):
+    def clear_effect(self):
         '''Restore all target's available actions and stats'''
         self.target.get_available_actions()
         self.target.hit_chance = self._pre_silence_stats['hit']
@@ -145,9 +141,52 @@ class Frozen(Effect):
         print("You are frozen... You can't even move a finger!")
         time.sleep(LONG)
 
-    def _clear_effect(self):
+    def clear_effect(self):
         '''Restore all target's available actions'''
         self.target.get_available_actions()
         time.sleep(SHORT)
         print("\nAs you slowly thaw, you're free to move again!")
+        time.sleep(MEDIUM)
+
+
+class Hidden(Effect):
+    '''
+    Grant +50% dodge chance.
+    Fade upon attacking, or using damaging ability. 
+    Fade upon taking damage.
+    Next successful attack or hunter's Snipe will crit.
+    '''
+    
+    def __init__(self, target):
+        super().__init__(target=target, duration=2)
+        self.name = 'Hidden'
+        self.is_debuff = False
+
+    def _apply_consequences(self):
+        '''
+        Hide if not already hidden, temporarily granting
+        +50% dodge chance and increased hit chance
+        If already hidden, say it.
+        '''
+        if not self.target.hidden:
+            time.sleep(SHORT)
+            print("You vanish in the shadows.")
+            time.sleep(LONG)
+            self.target.hidden = True
+            self.old_dodge = self.target.dodge_chance
+            self.old_hit = self.target.hit_chance
+            self.target.dodge_chance += 50
+            self.target.hit_chance = 100
+        else:
+            time.sleep(SHORT)
+            print("You are hidden.")
+            time.sleep(LONG)
+
+    def clear_effect(self):
+        '''Remove hiding and restore previous dodge chance.'''
+        self.target.hidden = False
+        self.target.dodge_chance = self.old_dodge
+        self.target.hit_chance = self.old_hit
+        time.sleep(SHORT)
+        print("\nYou revealed yourself!")
         time.sleep(MEDIUM)
