@@ -197,6 +197,7 @@ class Character(Fighter):
                 self.heal(random.randint(6,10))
                 self.reviving = False
                 time.sleep(LONG)
+                return
         except AttributeError:
             pass
         sys.exit()
