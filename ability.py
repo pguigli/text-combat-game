@@ -202,7 +202,7 @@ class Cleanse(Ability):
     def _activate(self, target):
         for effect in self.user.status:
             if effect.is_debuff:
-                self.user.status.clear_effect(effect)
+                effect.clear_effect()
                 self.user.status.remove(effect)
                 time.sleep(SHORT)
                 print(f"You cleansed yourself of {effect.name}!\n")
