@@ -4,7 +4,7 @@ import random
 import sys
 import time
 
-from ability import (DrainLife, Greenify, Obliterate,
+from ability import (Leech, Greenify, Obliterate,
                      ExtraHP, CounterAttack, Brutalize,
                      Cleanse, Pray, FinalWish,
                      Hide, Trap, Snipe)
@@ -17,7 +17,7 @@ from weapon import (Axe, Dagger, Bow,
 SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 ABILITIES = {
-    'Sorcerer': [DrainLife, Greenify, Obliterate],
+    'Sorcerer': [Leech, Greenify, Obliterate],
     'Warrior': [ExtraHP, CounterAttack, Brutalize],
     'Hunter': [Hide, Trap, Snipe],
     'Priest': [Cleanse, Pray, FinalWish]
@@ -36,7 +36,7 @@ JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
                L3: [B]rutalize - Steal target's weapon and use it!
 
 ◊ [S]orcerer:  +2 Ability Power
-               L1: [D]rain Life - Deal dmg, and heal yourself
+               L1: [L]eech - Deal dmg, and heal yourself
                L2: [G]reenify - Target loses all special powers
                L3: [O]bliterate - Deal massive damage
 
@@ -81,6 +81,7 @@ class Character(Fighter):
         self.name = input("Character's name:\n> ").strip().title()
         self.job = "Jobless"
         self.status = []
+        self.defending = False
         self.level = 1
         self.hp = 10
         self.max_hp = 10
@@ -200,11 +201,22 @@ class Character(Fighter):
             pass
         sys.exit()
 
-    def rest(self, target):  # useless but required target argument
+    def toggle_defend(self, target):   # useless but required target argument
+        '''Temporarily reduce incoming damage by increasing toughness'''
+        if not self.defending:
+            print("\nYou take a defensive stance.")
+            self.defending = True
+            self.toughness += 3
+            time.sleep(LONG)
+        else:
+            self.defending = False
+            self.toughness -= 3
+
+    def rest(self, target):     # useless but required target argument
         '''Print heal message and heal player for 1 hp'''
         print("\nYou rest, and regenerate 1 HP!")
         self.heal(1)
-        time.sleep(SHORT)
+        time.sleep(LONG)
 
     def attack(self, target):
         '''
@@ -299,6 +311,7 @@ class Character(Fighter):
                         ability.key,
                         [_display_name, ability.use]
                         ))
+            _actions.append(('d', ['[D]efend', self.toggle_defend]))
             _actions.append(('r', ['[R]est', self.rest]))
 
         _actions.append(('q', ['[Q]uit', self.quit_game]))
@@ -326,6 +339,7 @@ class Warrior(Character):
         self.toughness += 1
         self.attack_power += 1
         self.abilities = self._get_abilities()
+        self.get_available_actions()
 
 
 class Sorcerer(Character):
@@ -334,6 +348,7 @@ class Sorcerer(Character):
         self.job = "Sorcerer"
         self.ability_power += 2
         self.abilities = self._get_abilities()
+        self.get_available_actions()
 
 
 class Priest(Character):
@@ -344,6 +359,7 @@ class Priest(Character):
         self.dodge_chance += 10
         self.reviving = False
         self.abilities = self._get_abilities()
+        self.get_available_actions()
 
 
 class Hunter(Character):
@@ -355,3 +371,4 @@ class Hunter(Character):
         self.laid_trap = False
         self.hidden = False
         self.abilities = self._get_abilities()
+        self.get_available_actions()

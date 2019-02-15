@@ -58,13 +58,13 @@ class Ability:
         return dmg if dmg > 0 else 1
 
 
-class DrainLife(Ability):
+class Leech(Ability):
     '''Deal direct damage to target, and heal for the same amount'''
     
     def __init__(self):
         super().__init__()
-        self.name = '[D]rain Life'
-        self.key = 'd'
+        self.name = '[L]eech'
+        self.key = 'l'
 
     def _activate(self, target):
         dmg = self.get_dmg(target)

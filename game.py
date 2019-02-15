@@ -85,11 +85,6 @@ class Game:
             rest,
             quit.
         '''
-        # if "Confused" in [d.name for d in self.player.status] and
-        #         65 > random.randint(1,100):
-        #     self.player.action_prompt()(self.player)
-        # else:
-        self.player.get_available_actions()
         for ability in self.player.abilities.values():
             ability.update_timer()
         _effect_names = [d.name for d in self.player.status]
@@ -139,12 +134,15 @@ class Game:
 
     def cleanup(self):
         '''
+        If player was defending, it wears off.
         Check for dead monster. Give xp and level player up.
         Get next monster.
         Generate all player's available actions.
         Check for player status: apply effects (possibly, 
         remove actions), or make effects expire.
         '''
+        if self.player.defending:
+            self.player.toggle_defend(self.player)
         if self.monster.just_died:
             self.player.get_xp(self.monster)
             self.monster = self.get_next_monster()
