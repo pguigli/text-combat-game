@@ -37,7 +37,7 @@ class Ability:
             time.sleep(SHORT)
             print("CRITICAL FAIL!")
             time.sleep(LONG)
-            print("Damn! You totally messed up!")
+            print("Damn! You totally messed up!\n")
             time.sleep(MEDIUM)
 
     def update_timer(self):
@@ -209,6 +209,7 @@ class Cleanse(Ability):
                 self.user.status.remove(effect)
                 time.sleep(SHORT)
         time.sleep(SHORT)
+        self.user.get_available_actions()
 
 
 class Pray(Ability):
@@ -223,7 +224,8 @@ class Pray(Ability):
         self.cooldown = 2
 
     def _activate(self, target):
-        heal = 2 * self.user.ability_power + 1
+        heal = math.floor(2 * self.user.ability_power/100 + 1)
+        heal += random.choice([-1, 0, 1])
         print("You start praying...")
         time.sleep(LONG)
         if 10 >= random.randint(1,100):

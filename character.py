@@ -202,7 +202,7 @@ class Character(Fighter):
             pass
         sys.exit()
 
-    def toggle_defend(self, target):   # useless but required target argument
+    def toggle_defend(self, _):
         '''Temporarily reduce incoming damage by increasing toughness'''
         if not self.defending:
             print("\nYou take a defensive stance.")
@@ -213,7 +213,7 @@ class Character(Fighter):
             self.defending = False
             self.toughness -= 50
 
-    def rest(self, target):     # useless but required target argument
+    def rest(self, _):
         '''Print heal message and heal player for 1 hp'''
         print("\nYou rest, and regenerate 1 HP!")
         self.heal(1)
@@ -252,7 +252,7 @@ class Character(Fighter):
             pass
         time.sleep(LONG)
 
-    def quit_game(self):
+    def quit_game(self, _):
         time.sleep(0.5)
         print("\nYou flee like a coward!")
         sys.exit()

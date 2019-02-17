@@ -101,7 +101,6 @@ class Game:
             _choice = ''
             if input("Use [C]leanse? [y/n]\n> ").lower() in 'cy':
                 self.player.abilities['1'].use(self.monster)
-                self.player.get_available_actions()
         time.sleep(SHORT)
         self.player.build_action_prompt()(self.monster)
 
