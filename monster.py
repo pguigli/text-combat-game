@@ -3,7 +3,7 @@ import random
 import sys
 import time
 
-from effect import Burning, Confused, Frozen, Silenced
+from effect import Burning, Traumatized, Frozen, Silenced
 from fighter import Fighter
 from weapon import (KungFu, Axe, Dagger, Bow,
                     Lightsaber, Railgun)
@@ -15,7 +15,7 @@ COLORS = {
     'green': [None, None],
     'white': ['freezes you', Frozen],
     'red': ['sets you on fire', Burning],
-    'spectral': ['confuses you', Confused],
+    'spectral': ['traumatizes you', Traumatized],
     'black': ['silences you', Silenced]
     }
 
@@ -69,8 +69,8 @@ MONSTER COLOR INFORMATION
             'silenced': Lose all special powers.
             Duration: [1 turn]
 
-◊ Spectral: Monster's attacks may confuse you;
-            'confused': Chance to hurt yourself on attacking / cast
+◊ Spectral: Monster's attacks may traumatize you;
+            'traumatized': Can't Attack or Defend.
             Duration: [2 turns]
 ------------------------------------------------------------------------""")
 
@@ -159,11 +159,13 @@ class Monster(Fighter):
         self.just_died = True
 
     def rest(self):
-        '''Print random rest message, and heal monster for 1 hp'''
+        '''Print random rest message, and heal monster for 1-2 hp'''
         msg = random.choice(REST_MESSAGES)
+        amount = random.choice([1,1,2])
+        self.heal(amount)
         print(f"\nThe {self.color} {self.name} {msg}, "
-              "and regenerates 1 HP!")
-        self.heal(1)
+              f"and regenerates {amount} HP!")
+        self.heal(random.choice([1,1,2]))
         time.sleep(LONG)
 
     def attack(self, target):
@@ -174,6 +176,7 @@ class Monster(Fighter):
                 dealing damage
                 and try to apply effects
             miss, if target dodges, and do nothing
+        If target was resting, increased crit chance against him.
         '''
         print(f"\nThe {self.color} {self.name} attacks!")
         time.sleep(MEDIUM)
@@ -182,8 +185,13 @@ class Monster(Fighter):
         if self.hits(self.weapon, target):
             time.sleep(SHORT)
             print(" but you fail!")
+            if target.resting:
+                old_crit = self.weapon.crit_chance
+                self.weapon.crit_chance += 15
             dmg = self.get_atk_dmg(self.weapon, target)
             time.sleep(MEDIUM)
+            if target.resting:
+                self.weapon.crit_chance = old_crit
             print(f"The {self.color} {self.name} "
                   f"hits you for {dmg} HP.")
             target.take_dmg(dmg)
@@ -199,6 +207,7 @@ class Monster(Fighter):
         The first time, do nothing, but set a "preparing" flag.
         The second time, deal target a large amount of damage.
         Can be missed (15% chance).
+        If target was resting, increased crit chance against him.
         '''
         if not self.preparing:
             print(f"\nThe {self.name} starts concentrating his powers.")
@@ -208,10 +217,15 @@ class Monster(Fighter):
             self.preparing = False
             sys.stdout.flush()
             if 85 >= random.randint(1,100):
+                if target.resting:
+                    old_crit = self.weapon.crit_chance
+                    self.weapon.crit_chance += 15
                 dmg = 2 * self.get_atk_dmg(self.weapon, target)
                 time.sleep(MEDIUM)
                 print(f"You take {dmg} dmg!")
                 target.take_dmg(dmg)
+                if target.resting:
+                    self.weapon.crit_chance = old_crit
                 if self.color != 'green':
                     self.apply_effect(target)
             else:

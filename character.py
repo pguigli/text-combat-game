@@ -82,6 +82,7 @@ class Character(Fighter):
         self.job = "Jobless"
         self.status = []
         self.defending = False
+        self.resting = False
         self.level = 1
         self.hp = 10
         self.max_hp = 10
@@ -177,10 +178,6 @@ class Character(Fighter):
             'burning': [
                 "You burn to death.",
                 "The fire damage is fatal. You're dead."
-                ],
-            'confusion': [
-                "How silly! You killed yourself.",
-                "Bravo! You died of stupidity!"
                 ]
             }
         msg = random.choice(messages[cause])
@@ -215,8 +212,10 @@ class Character(Fighter):
 
     def rest(self, _):
         '''Print heal message and heal player for 1 hp'''
-        print("\nYou rest, and regenerate 1 HP!")
-        self.heal(1)
+        amount = random.choice([1,1,2])
+        self.heal(amount)
+        print(f"\nYou rest, and regenerate {amount} HP!")
+        self.resting = True
         time.sleep(LONG)
 
     def attack(self, target):
@@ -275,7 +274,9 @@ class Character(Fighter):
             ability.user = self
         return _abilities
 
-    def get_available_actions(self, frozen=False, silenced=False):
+    def get_available_actions(self, frozen=False,
+                                    silenced=False,
+                                    traumatized=False):
         '''
         Build and return a list of available actions based on player
         level, and taking into account possible status effects.
@@ -294,7 +295,7 @@ class Character(Fighter):
         if frozen:
             _actions.append(('w', ['[W]ait, completely powerless',
                                        lambda *args: None]))
-        else:
+        elif not traumatized:
             _actions.append(('a', ['[A]ttack', self.attack]))
         if not frozen and not silenced:
             for (level, ability) in self.abilities.items():
@@ -312,8 +313,9 @@ class Character(Fighter):
                         ability.key,
                         [_display_name, ability.use]
                         ))
-        if not frozen:
+        if not frozen and not traumatized:
             _actions.append(('d', ['[D]efend', self.toggle_defend]))
+        if not frozen:
             _actions.append(('r', ['[R]est', self.rest]))
         _actions.append(('q', ['[Q]uit', self.quit_game]))
         self.actions = OrderedDict(_actions)

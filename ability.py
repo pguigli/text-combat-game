@@ -182,7 +182,7 @@ class Brutalize(Ability):
         time.sleep(LONG)
         print(f"You attack him with his own {stolen_weapon.name}!")
         time.sleep(LONG)
-        dmg = self.user.get_atk_dmg(stolen_weapon, target)
+        dmg = self.user.get_atk_dmg(stolen_weapon, target) + 2
         print(f"The {target.color} {target.name} takes {dmg} damage.")
         target.take_dmg(dmg)
         time.sleep(LONG)

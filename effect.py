@@ -115,18 +115,25 @@ class Silenced(Effect):
         time.sleep(MEDIUM)
 
 
-class Confused(Effect):
+class Traumatized(Effect):
     def __init__(self, target):
         super().__init__(duration=2, target=target)
-        self.name = 'Confused'
+        self.name = 'Traumatized'
 
     def _apply_consequences(self):
-        '''
-        Target has 60% chance to hurt itself 
-        when attacking or casting a spell
-        "'''
-        print("[Confusing...]")
+        '''Prevent target from attacking or defending'''
+        self.target.get_available_actions(traumatized=True)
+        time.sleep(SHORT)
+        print("You are traumatized... You can't attack or defend.")
         time.sleep(LONG)
+
+    def clear_effect(self):
+        '''Restore all target's available actions'''
+        self.target.get_available_actions()
+        time.sleep(SHORT)
+        print("\nYou gradually calm down, and gather yourself!")
+        time.sleep(MEDIUM)
+
 
 
 class Frozen(Effect):

@@ -145,6 +145,7 @@ class Game:
         Generate all player's available actions.
         Check for player status: apply effects (possibly, 
         remove actions), or make effects expire.
+        Cancel player rest.
         '''
         if self.player.defending:
             self.player.toggle_defend(self.player)
@@ -155,6 +156,7 @@ class Game:
         if self.player.status:
             for effect in self.player.status:
                 effect.tick_effect()
+        self.player.resting = False
 
 
     def print_footer(self):
