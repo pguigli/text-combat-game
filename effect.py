@@ -1,7 +1,7 @@
 import time
 
 
-SHORT, MEDIUM, LONG = 0.5, 1, 1.5
+SHORT, MEDIUM, LONG = 0, 0, 0
 
 
 class Effect:
@@ -78,10 +78,10 @@ class Silenced(Effect):
             'toughness': self.target.toughness
             }
         self.target.get_available_actions(silenced=True)
-        self.target.hit_chance = 80
+        self.target.hit_chance = 90
         self.target.dodge_chance = 20
-        self.target.attack_power = 1
-        self.target.ability_power = 1
+        self.target.attack_power = 100
+        self.target.ability_power = 100
         self.target.toughness = 0
         if self.target.job == 'Warrior':
             if self.target.hp > 10:
@@ -175,8 +175,10 @@ class Hidden(Effect):
             self.target.hidden = True
             self.old_dodge = self.target.dodge_chance
             self.old_hit = self.target.hit_chance
+            self.old_weapon_hit = self.target.weapon.hit_chance
             self.target.dodge_chance += 50
             self.target.hit_chance = 100
+            self.target.weapon.hit_chance = 100
         else:
             time.sleep(SHORT)
             print("You are hidden.")
@@ -187,6 +189,7 @@ class Hidden(Effect):
         self.target.hidden = False
         self.target.dodge_chance = self.old_dodge
         self.target.hit_chance = self.old_hit
+        self.target.weapon.hit_chance = self.old_weapon_hit
         time.sleep(SHORT)
         print("\nYou revealed yourself!")
         time.sleep(MEDIUM)

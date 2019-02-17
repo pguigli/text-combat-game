@@ -1,3 +1,4 @@
+import math
 import random
 import sys
 
@@ -6,10 +7,10 @@ from effect import Hidden
 
 class Fighter:
     def __init__(self):
-        self.hit_chance = 80 
+        self.hit_chance = 90
         self.dodge_chance = 20
-        self.attack_power = 1
-        self.ability_power = 1
+        self.attack_power = 100
+        self.ability_power = 100
         self.toughness = 0
         self.hidden = False
         self.hp = None
@@ -43,13 +44,13 @@ class Fighter:
         '''
         if self.hidden:
             w_dmg = weapon.get_dmg(will_crit=True)
-            dmg = (w_dmg * self.attack_power)
+            dmg = math.floor(w_dmg * self.attack_power / 100)
             if not pierce:
-                dmg -= target.toughness
+                dmg = math.floor(dmg * (100-target.toughness) / 100)
             return dmg if dmg > 0 else 1
-        dmg = (weapon.get_dmg() * self.attack_power)
+        dmg = math.floor(weapon.get_dmg() * self.attack_power / 100)
         if not pierce:
-            dmg -= target.toughness
+            dmg = math.floor(dmg * (100-target.toughness) / 100)
         return dmg if dmg > 0 else 1
     
     def die(self, cause=None):

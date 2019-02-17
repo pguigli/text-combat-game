@@ -1,3 +1,4 @@
+import math
 import random
 import sys
 import time
@@ -5,7 +6,7 @@ import time
 from effect import Hidden
 from weapon import Railgun
 
-SHORT, MEDIUM, LONG = 0.5, 1, 1.5
+SHORT, MEDIUM, LONG = 0, 0, 0
 
 
 class Ability:
@@ -53,7 +54,8 @@ class Ability:
         Return ability damage, based on user ability power
         and target toughness, with a minimum of 1.
         '''
-        _base_dmg = 2 * self.user.ability_power - target.toughness
+        _base_dmg = 2 * self.user.ability_power / 100
+        _base_dmg = math.floor(_base_dmg * (100-target.toughness) / 100)
         dmg = random.randint(_base_dmg-1, _base_dmg+1)
         return dmg if dmg > 0 else 1
 
@@ -116,7 +118,7 @@ class Obliterate(Ability):
 
     def _activate(self, target):
         _base_dmg = self.get_dmg(target)
-        dmg = 2*_base_dmg - target.toughness
+        dmg = 2 * _base_dmg
         print("You focus all your powers, and unleash your wrath "
               f"on the poor {target.name}.")
         time.sleep(MEDIUM)

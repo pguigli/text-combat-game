@@ -7,7 +7,7 @@ from character import get_job
 from monster import Goblin, Troll, Dragon
 
 
-SHORT, MEDIUM, LONG = 0.5, 1, 1.5
+SHORT, MEDIUM, LONG = 0, 0, 0
 
 
 class Game:

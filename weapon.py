@@ -3,7 +3,7 @@ import random
 import time
 
 
-SHORT, MEDIUM, LONG = 0.5, 1, 1.5
+SHORT, MEDIUM, LONG = 0, 0, 0
 
 
 def show_weapons():
@@ -26,7 +26,7 @@ class Weapon:
         self.name = "Weapon"
         self.min_dmg = 1
         self.max_dmg = 1
-        self.hit_chance = 80
+        self.hit_chance = 90
         self.crit_chance = 5
         self.is_ranged = False
 
@@ -69,7 +69,7 @@ class Dagger(Weapon):
         super().__init__()
         self.name = "Dagger"
         self.max_dmg = 2
-        self.hit_chance = 90
+        self.hit_chance = 100
 
 
 class Bow(Weapon):
@@ -86,7 +86,7 @@ class Lightsaber(Weapon):
         self.name = "Lightsaber"
         self.min_dmg = 2
         self.max_dmg = 4
-        self.hit_chance = 90
+        self.hit_chance = 100
 
 
 class Railgun(Weapon):
@@ -95,5 +95,5 @@ class Railgun(Weapon):
         self.name = "Railgun"
         self.min_dmg = 3
         self.max_dmg = 5
-        self.hit_chance = 90
+        self.hit_chance = 100
         self.is_ranged = True

@@ -14,7 +14,7 @@ from weapon import (Axe, Dagger, Bow,
                     show_weapons)
 
 
-SHORT, MEDIUM, LONG = 0.5, 1, 1.5
+SHORT, MEDIUM, LONG = 0, 0, 0
 
 ABILITIES = {
     'Sorcerer': [Leech, Greenify, Obliterate],
@@ -148,16 +148,16 @@ class Character(Fighter):
         spells, depending on current level
         '''
         if self.level == 2:
-            self.attack_power += 1
-            self.ability_power += 1
-            print("\nYou gain +1 Attack Power, and +1 Ability Power!")
+            self.attack_power += 30
+            self.ability_power += 30
+            print("\nYou gain +30% Attack Power, and +30% Ability Power!")
             time.sleep(MEDIUM)
             print(f"You learn {self.abilities['2'].name}!")
             time.sleep(LONG)
         if self.level == 3:
-            self.toughness += 1
+            self.toughness += 15
             self.dodge_chance += 10
-            print("\nYou gain +1 Toughness, and +10% Dodge Chance!")
+            print("\nYou gain +15% Toughness, and +10% Dodge Chance!")
             time.sleep(MEDIUM)
             print(f"You learn {self.abilities['3'].name}!")
             time.sleep(LONG)
@@ -207,11 +207,11 @@ class Character(Fighter):
         if not self.defending:
             print("\nYou take a defensive stance.")
             self.defending = True
-            self.toughness += 4
+            self.toughness += 50
             time.sleep(LONG)
         else:
             self.defending = False
-            self.toughness -= 4
+            self.toughness -= 50
 
     def rest(self, target):     # useless but required target argument
         '''Print heal message and heal player for 1 hp'''
@@ -337,8 +337,8 @@ class Warrior(Character):
         self.job = "Warrior"
         self.hp = 14
         self.max_hp = 14
-        self.toughness += 1
-        self.attack_power += 1
+        self.toughness = 20
+        self.attack_power = 150
         self.abilities = self._get_abilities()
         self.get_available_actions()
 
@@ -347,7 +347,7 @@ class Sorcerer(Character):
     def __init__(self):
         super().__init__()
         self.job = "Sorcerer"
-        self.ability_power += 2
+        self.ability_power = 200
         self.abilities = self._get_abilities()
         self.get_available_actions()
 
@@ -356,7 +356,7 @@ class Priest(Character):
     def __init__(self):
         super().__init__()
         self.job = "Priest"
-        self.toughness += 1
+        self.toughness = 20
         self.dodge_chance += 10
         self.reviving = False
         self.abilities = self._get_abilities()
