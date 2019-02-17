@@ -9,7 +9,7 @@ from weapon import (KungFu, Axe, Dagger, Bow,
                     Lightsaber, Railgun)
 
 
-SHORT, MEDIUM, LONG = 0, 0, 0
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 COLORS = {
     'green': [None, None],
@@ -81,8 +81,7 @@ MONSTER COLOR INFORMATION
 
 
 class Monster(Fighter):
-
-    def __init__(self, min_hp=1, max_hp=1,
+    def __init__(self, min_hp=2, max_hp=3,
                        min_xp=1, max_xp=2):
         super().__init__()
         self.name = 'Monster'
@@ -93,7 +92,7 @@ class Monster(Fighter):
         self.color = random.choice(list(COLORS.keys()))
         self.attack_effect = self.get_attack_effect()
         self.debuff = self.get_debuff()     #debuff class, not instance
-        self.debuff_chance = 100
+        self.debuff_chance = 65
         self.allowed_weapons = ["level_0"]
         self.weapon = self.get_weapon()
         self.just_died = False
@@ -236,7 +235,7 @@ class Monster(Fighter):
 
 class Goblin(Monster):
     def __init__(self):
-        super().__init__(min_hp=1, max_hp=2,
+        super().__init__(min_hp=2, max_hp=3,
                          min_xp=2, max_xp=3)
         self.name = 'Goblin'
         self.allowed_weapons = ["level_0", "level_1"]
@@ -245,25 +244,26 @@ class Goblin(Monster):
 
 class Troll(Monster):
     def __init__(self):
-        super().__init__(min_hp=3, max_hp=5,
-                         min_xp=3, max_xp=5)
+        super().__init__(min_hp=4, max_hp=6,
+                         min_xp=3, max_xp=4)
         self.name = 'Troll'
         self.sound = 'bwaaah'
         self.allowed_weapons = ["level_1", "level_2"]
         self.weapon = self.get_weapon()
-        self.toughness = 25
-        self.attack_power = 150
+        self.toughness = 20
+        self.attack_power = 120
 
 
 class Dragon(Monster):
     def __init__(self):
-        super().__init__(min_hp=6, max_hp=10,
+        super().__init__(min_hp=7, max_hp=10,
                          min_xp=5, max_xp=8)
         self.name = 'Dragon'
         self.sound = "grrrr"
         while self.color == 'green':
             self.color = random.choice(list(COLORS.keys()))
+            self.debuff = self.get_debuff()
         self.allowed_weapons = ["level_2", "level_3"]
         self.weapon = self.get_weapon()
-        self.toughness = 50
-        self.attack_power = 200
+        self.toughness = 40
+        self.attack_power = 170

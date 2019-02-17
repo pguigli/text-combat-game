@@ -1,7 +1,7 @@
 import time
 
 
-SHORT, MEDIUM, LONG = 0, 0, 0
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 
 class Effect:

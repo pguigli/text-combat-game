@@ -6,7 +6,7 @@ import time
 from effect import Hidden
 from weapon import Railgun
 
-SHORT, MEDIUM, LONG = 0, 0, 0
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 
 class Ability:
@@ -69,7 +69,7 @@ class Leech(Ability):
         self.key = 'l'
 
     def _activate(self, target):
-        dmg = self.get_dmg(target)
+        dmg = self.get_dmg(target) + 1
         print(f"You leech the {target.color} {target.name}'s "
               f"vital essence, dealing {dmg} damage.")
         time.sleep(MEDIUM)

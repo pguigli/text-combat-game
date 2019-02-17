@@ -14,7 +14,7 @@ from weapon import (Axe, Dagger, Bow,
                     show_weapons)
 
 
-SHORT, MEDIUM, LONG = 0, 0, 0
+SHORT, MEDIUM, LONG = 0.5, 1, 1.5
 
 ABILITIES = {
     'Sorcerer': [Leech, Greenify, Obliterate],
@@ -30,17 +30,17 @@ def show_jobs():
 =========================================================================
 JOB INFORMATION | Start at L1, and learn a new ability at L2 and L3.
 -------------------------------------------------------------------------
-◊ [W]arrior:   +1 Toughness, +1 Attack Power
+◊ [W]arrior:   +20% Toughness, +50% Attack Power
                L1: +4 base HP (Passive)
                L2: Counter-attack (Passive) - An eye for an eye!
                L3: [B]rutalize - Steal target's weapon and use it!
 
-◊ [S]orcerer:  +2 Ability Power
+◊ [S]orcerer:  +100% Ability Power
                L1: [L]eech - Deal dmg, and heal yourself
                L2: [G]reenify - Target loses all special powers
                L3: [O]bliterate - Deal massive damage
 
-◊ [P]riest:    +1 Toughness, +10% Dodge Chance
+◊ [P]riest:    +10% Toughness, +50% Ability Power, +10% Dodge Chance
                L1: [C]leanse - Remove all debuffs
                L2: [P]ray - Heal yourself for a small amount
                L3: [F]inal wish - Next death, resurrect with 2-5 health
@@ -156,7 +156,7 @@ class Character(Fighter):
             print(f"You learn {self.abilities['2'].name}!")
             time.sleep(LONG)
         if self.level == 3:
-            self.toughness += 15
+            self.toughness += 10
             self.dodge_chance += 10
             print("\nYou gain +15% Toughness, and +10% Dodge Chance!")
             time.sleep(MEDIUM)
@@ -358,7 +358,8 @@ class Priest(Character):
     def __init__(self):
         super().__init__()
         self.job = "Priest"
-        self.toughness = 20
+        self.ability_power = 150
+        self.toughness = 10
         self.dodge_chance += 10
         self.reviving = False
         self.abilities = self._get_abilities()
