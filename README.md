@@ -1,5 +1,5 @@
-This is a text-based combat game written in python3.7.
-You must fight your way and survive through a succession of 5 enemies to win.
+This is a text-based combat game that I wrote in python3.7 to practice object-oriented programming, general Python, and have fun!  
+In this game, you must fight your way through a succession of several enemies to win, using various spells and attacks.
 
 **How to run the game:**  
 `python3.7 game.py`
@@ -94,7 +94,5 @@ Enemies can be:
 
 # Notes
 
-This game was developed solely as a means to learn Python for myself. Hopefully, some of you might have fun with it!
-Don't hesitate to implement your own mechanics. And please show me your version if you do!
-
-This game is not very well balanced, yet. You might find that you keep winning, or losing, or that some class is overpowered. If this is the case, feel free to fix the numbers, and let me know!
+This game is not very well balanced yet. Feel free to fix the numbers, or to implement your own mechanics.  
+If you do, please let me know, I'd be happy to see whatever you come up with!
